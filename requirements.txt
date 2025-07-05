@@ -1,0 +1,92 @@
+# Data Engineering Core
+pandas>=1.5.0
+numpy>=1.24.0
+pyarrow>=10.0.0
+boto3>=1.26.0
+botocore>=1.29.0
+
+# Data Ingestion
+requests>=2.28.0
+yfinance>=0.2.0
+alpha-vantage>=2.3.0
+fredapi>=0.5.0
+beautifulsoup4>=4.11.0
+
+# Data Validation
+pydantic>=1.10.0
+jsonschema>=4.17.0
+great-expectations>=0.15.0
+
+# Database Connectivity
+psycopg2-binary>=2.9.0
+sqlalchemy>=1.4.0
+redshift-connector>=2.0.0
+
+# Airflow (for local development)
+apache-airflow>=2.5.0
+apache-airflow-providers-amazon>=7.0.0
+apache-airflow-providers-postgres>=5.0.0
+
+# Data Transformation
+dbt-core>=1.4.0
+dbt-redshift>=1.4.0
+
+# Monitoring & Logging
+structlog>=22.3.0
+prometheus-client>=0.15.0
+statsd>=4.0.0
+
+# Configuration Management
+python-dotenv>=0.19.0
+pyyaml>=6.0
+configparser>=5.3.0
+
+# Testing
+pytest>=7.2.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+moto>=4.1.0
+factory-boy>=3.2.0
+
+# Code Quality
+black>=22.12.0
+flake8>=6.0.0
+isort>=5.11.0
+mypy>=0.991
+pre-commit>=2.21.0
+
+# Utilities
+click>=8.1.0
+rich>=13.0.0
+tqdm>=4.64.0
+schedule>=1.1.0
+
+# Financial Analysis
+ta-lib>=0.4.0
+quantlib>=1.29
+scipy>=1.10.0
+scikit-learn>=1.2.0
+
+# Data Visualization (for analysis)
+matplotlib>=3.6.0
+seaborn>=0.12.0
+plotly>=5.12.0
+
+# Development Tools
+jupyter>=1.0.0
+jupyterlab>=3.5.0
+ipython>=8.8.0
+
+# Security
+cryptography>=38.0.0
+keyring>=23.13.0
+
+# Performance
+numba>=0.56.0
+cython>=0.29.0
+
+# Documentation
+sphinx>=5.3.0
+sphinx-rtd-theme>=1.1.0
+mkdocs>=1.4.0
+mkdocs-material>=8.5.0
