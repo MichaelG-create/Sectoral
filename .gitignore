@@ -9,6 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
+# vscode settings
+.vscode/
+
 # reports and logs
 *.log
 *.csv
