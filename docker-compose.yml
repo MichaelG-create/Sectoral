@@ -1,0 +1,154 @@
+version: '3.8'
+
+services:
+  # PostgreSQL pour développement local (remplace Redshift)
+  postgres:
+    image: postgres:13
+    container_name: financial-pipeline-db
+    environment:
+      POSTGRES_DB: financial_data
+      POSTGRES_USER: pipeline_user
+      POSTGRES_PASSWORD: pipeline_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/ddl:/docker-entrypoint-initdb.d
+    networks:
+      - pipeline-network
+
+  # Redis pour caching
+  redis:
+    image: redis:7-alpine
+    container_name: financial-pipeline-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - pipeline-network
+
+  # Airflow services
+  airflow-webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: financial-pipeline-airflow-webserver
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://pipeline_user:pipeline_password@postgres/financial_data
+      - AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://pipeline_user:pipeline_password@postgres/financial_data
+      - AIRFLOW__CELERY__BROKER_URL=redis://redis:6379/0
+      - AIRFLOW__CORE__FERNET_KEY=your_fernet_key_here
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth
+      - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=true
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./python-scripts:/opt/airflow/python-scripts
+    ports:
+      - "8080:8080"
+    command: webserver
+    networks:
+      - pipeline-network
+
+  airflow-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: financial-pipeline-airflow-scheduler
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://pipeline_user:pipeline_password@postgres/financial_data
+      - AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://pipeline_user:pipeline_password@postgres/financial_data
+      - AIRFLOW__CELERY__BROKER_URL=redis://redis:6379/0
+      - AIRFLOW__CORE__FERNET_KEY=your_fernet_key_here
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./python-scripts:/opt/airflow/python-scripts
+    command: scheduler
+    networks:
+      - pipeline-network
+
+  airflow-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: financial-pipeline-airflow-worker
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://pipeline_user:pipeline_password@postgres/financial_data
+      - AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://pipeline_user:pipeline_password@postgres/financial_data
+      - AIRFLOW__CELERY__BROKER_URL=redis://redis:6379/0
+      - AIRFLOW__CORE__FERNET_KEY=your_fernet_key_here
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./python-scripts:/opt/airflow/python-scripts
+    command: celery worker
+    networks:
+      - pipeline-network
+
+  # Jupyter pour développement et analyse
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyter
+    container_name: financial-pipeline-jupyter
+    depends_on:
+      - postgres
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=financial-pipeline-token
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./python-scripts:/home/jovyan/work/python-scripts
+      - ./config:/home/jovyan/work/config
+    networks:
+      - pipeline-network
+
+  # LocalStack pour simuler AWS services en local
+  localstack:
+    image: localstack/localstack:1.4
+    container_name: financial-pipeline-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3,redshift,lambda,iam
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - localstack_data:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - pipeline-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  localstack_data:
+
+networks:
+  pipeline-network:
+    driver: bridge
