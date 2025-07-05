@@ -1,0 +1,229 @@
+# =============================================================================
+# TERRAFORM VARIABLES TEMPLATE - Financial Data Pipeline
+# =============================================================================
+# Copy this file to terraform.tfvars and fill in your values
+
+# -----------------------------------------------------------------------------
+# Project Configuration
+# -----------------------------------------------------------------------------
+
+project_name = "financial-data-pipeline"
+environment  = "dev"
+aws_region   = "us-east-1"
+
+# -----------------------------------------------------------------------------
+# S3 Configuration
+# -----------------------------------------------------------------------------
+
+# S3 bucket names must be globally unique - update these with your prefix
+s3_raw_bucket_name       = "your-org-financial-raw-data-dev"
+s3_processed_bucket_name = "your-org-financial-processed-data-dev"
+s3_logs_bucket_name      = "your-org-financial-logs-dev"
+s3_dags_bucket_name      = "your-org-financial-dags-dev"
+
+# S3 lifecycle configuration
+s3_raw_data_expiration_days       = 365
+s3_processed_data_expiration_days = 1095
+s3_logs_expiration_days           = 90
+
+# -----------------------------------------------------------------------------
+# Redshift Configuration
+# -----------------------------------------------------------------------------
+
+redshift_cluster_identifier = "financial-data-cluster-dev"
+redshift_database_name      = "financial_data"
+redshift_master_username    = "admin"
+redshift_master_password    = "YourSecurePassword123!"  # Change this!
+redshift_node_type          = "dc2.large"
+redshift_number_of_nodes    = 1
+redshift_port               = 5439
+redshift_skip_final_snapshot = true
+
+# Enable enhanced VPC routing for better security
+redshift_enhanced_vpc_routing = true
+
+# -----------------------------------------------------------------------------
+# MWAA (Airflow) Configuration
+# -----------------------------------------------------------------------------
+
+mwaa_environment_name = "financial-data-airflow-dev"
+mwaa_airflow_version  = "2.5.1"
+
+# Environment class determines compute resources
+# Options: mw1.small, mw1.medium, mw1.large
+mwaa_environment_class = "mw1.small"
+
+# Worker configuration
+mwaa_max_workers = 10
+mwaa_min_workers = 1
+
+# Scheduler configuration
+mwaa_schedulers = 1
+
+# Enable webserver and scheduler logs
+mwaa_webserver_log_level = "INFO"
+mwaa_scheduler_log_level = "INFO"
+mwaa_dag_log_level      = "INFO"
+mwaa_worker_log_level   = "INFO"
+mwaa_task_log_level     = "INFO"
+
+# -----------------------------------------------------------------------------
+# VPC Configuration
+# -----------------------------------------------------------------------------
+
+# If you want to use existing VPC, uncomment and fill these
+# vpc_id = "vpc-xxxxxxxxx"
+# private_subnet_ids = ["subnet-xxxxxxxxx", "subnet-yyyyyyyyy"]
+# public_subnet_ids = ["subnet-aaaaaaa", "subnet-bbbbbbb"]
+
+# If creating new VPC, use these settings
+vpc_cidr_block = "10.0.0.0/16"
+
+# Availability zones for multi-AZ deployment
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+# -----------------------------------------------------------------------------
+# Security Configuration
+# -----------------------------------------------------------------------------
+
+# CIDR blocks that can access Redshift
+redshift_allowed_cidr_blocks = ["10.0.0.0/16"]
+
+# Enable deletion protection for production
+enable_deletion_protection = false
+
+# Enable encryption at rest
+enable_encryption = true
+
+# -----------------------------------------------------------------------------
+# Monitoring Configuration
+# -----------------------------------------------------------------------------
+
+# CloudWatch log retention in days
+cloudwatch_log_retention_days = 14
+
+# Enable detailed monitoring
+enable_detailed_monitoring = true
+
+# Cost monitoring threshold (in USD)
+cost_anomaly_threshold = 100.0
+
+# SNS topic for notifications
+notification_email = "your-email@example.com"
+
+# -----------------------------------------------------------------------------
+# Data Sources Configuration
+# -----------------------------------------------------------------------------
+
+# API rate limits and configurations
+alpha_vantage_api_calls_per_minute = 5
+yahoo_finance_api_calls_per_minute = 2000
+fred_api_calls_per_minute         = 120
+
+# Data refresh intervals (in minutes)
+stock_data_refresh_interval = 60
+sector_data_refresh_interval = 1440  # daily
+macro_data_refresh_interval = 1440   # daily
+
+# -----------------------------------------------------------------------------
+# Tags Configuration
+# -----------------------------------------------------------------------------
+
+# Common tags applied to all resources
+common_tags = {
+  Project     = "financial-data-pipeline"
+  Environment = "dev"
+  Owner       = "data-engineering-team"
+  ManagedBy   = "terraform"
+  CostCenter  = "analytics"
+  Purpose     = "financial-analysis"
+}
+
+# -----------------------------------------------------------------------------
+# Backup Configuration
+# -----------------------------------------------------------------------------
+
+# Redshift backup retention period
+redshift_backup_retention_period = 7
+
+# Enable automated backups
+enable_automated_backups = true
+
+# Backup window (UTC)
+backup_window = "03:00-04:00"
+
+# Maintenance window (UTC)
+maintenance_window = "sun:04:00-sun:05:00"
+
+# -----------------------------------------------------------------------------
+# Performance Configuration
+# -----------------------------------------------------------------------------
+
+# Redshift query timeout (in seconds)
+redshift_query_timeout = 300
+
+# Enable query result caching
+enable_query_result_caching = true
+
+# Enable concurrency scaling
+enable_concurrency_scaling = false
+
+# -----------------------------------------------------------------------------
+# Development/Testing Configuration
+# -----------------------------------------------------------------------------
+
+# Enable test data generation
+enable_test_data_generation = true
+
+# Test data volume (small, medium, large)
+test_data_volume = "small"
+
+# Enable debug mode
+enable_debug_mode = true
+
+# -----------------------------------------------------------------------------
+# Secrets Configuration
+# -----------------------------------------------------------------------------
+
+# Secrets Manager secret names
+alpha_vantage_secret_name = "financial-pipeline/alpha-vantage-api-key"
+yahoo_finance_secret_name = "financial-pipeline/yahoo-finance-config"
+fred_secret_name         = "financial-pipeline/fred-api-key"
+
+# -----------------------------------------------------------------------------
+# Lambda Configuration
+# -----------------------------------------------------------------------------
+
+# Lambda function configurations
+lambda_timeout = 300
+lambda_memory_size = 512
+lambda_runtime = "python3.9"
+
+# -----------------------------------------------------------------------------
+# Data Quality Configuration
+# -----------------------------------------------------------------------------
+
+# Enable data quality monitoring
+enable_data_quality_monitoring = true
+
+# Data quality check frequency (in minutes)
+data_quality_check_frequency = 60
+
+# Data freshness threshold (in hours)
+data_freshness_threshold = 24
+
+# -----------------------------------------------------------------------------
+# Disaster Recovery Configuration
+# -----------------------------------------------------------------------------
+
+# Enable cross-region replication
+enable_cross_region_replication = false
+
+# Disaster recovery region
+disaster_recovery_region = "us-west-2"
+
+# RTO (Recovery Time Objective) in hours
+rto_hours = 24
+
+# RPO (Recovery Point Objective) in hours
+rpo_hours = 12
