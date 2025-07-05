@@ -1,5 +1,6 @@
 # project plan files
 *.odt
+*.~lock*.odt#   # LibreOffice lock files
 
 # Python-generated files
 __pycache__/
