@@ -1,171 +1,237 @@
-# Sectoral 📊
+# 📈 Financial Data Pipeline - Sectoral Performance Analysis
 
-> **Pipeline d'analyse sectorielle automatisée des marchés financiers**
+## 🎯 Project Overview
 
-Sectoral est un projet de data engineering qui démontre la mise en place d'un pipeline complet d'ingestion, transformation et analyse de données financières, avec un focus sur les performances sectorielles des marchés boursiers.
+Automated pipeline for analyzing sectoral performance of financial markets to identify investment trends and generate business insights.
 
-## 🎯 Vision du Projet
-
-**Problématique Business** : Les investisseurs institutionnels ont besoin d'outils automatisés pour identifier les tendances sectorielles, optimiser leurs allocations d'actifs et détecter les opportunités de rotation sectorielle.
-
-**Solution Technique** : Pipeline de données moderne utilisant les meilleures pratiques du data engineering pour transformer des données financières brutes en insights business actionnables.
+### Key Features
+- **Real-time data ingestion** from multiple financial APIs
+- **Automated ETL pipeline** with Apache Airflow
+- **Scalable cloud infrastructure** on AWS
+- **Advanced financial metrics** calculation
+- **Sectoral performance analysis** and risk management
 
 ## 🏗️ Architecture
 
-```mermaid
-graph TD
-    A[APIs Financières] --> B[Python Ingestion]
-    B --> C[AWS S3 Data Lake]
-    C --> D[dbt Transformations]
-    D --> E[Amazon Redshift]
-    E --> F[Analytics & Insights]
-    
-    G[Apache Airflow] --> B
-    G --> D
-    G --> H[Monitoring]
-    
-    I[Terraform] --> J[AWS Infrastructure]
+### Technology Stack
+- **Orchestration**: Apache Airflow (AWS MWAA)
+- **Infrastructure**: Terraform + AWS
+- **Data Lake**: AWS S3 (Parquet format)
+- **Data Warehouse**: Amazon Redshift
+- **Transformations**: dbt Core
+- **Monitoring**: CloudWatch + Airflow UI
+
+### Data Flow
+```
+Financial APIs → Python Ingestion → S3 Raw Data → dbt Transform → Redshift → Analytics
+                                 ↓
+                        Airflow DAGs (Orchestration)
 ```
 
-## 🛠️ Stack Technique
+## 📊 Data Sources
 
-| Composant | Technologie | Rôle |
-|-----------|------------|------|
-| **Orchestration** | Apache Airflow (MWAA) | Scheduling et monitoring des pipelines |
-| **Infrastructure** | Terraform + AWS | Infrastructure as Code |
-| **Ingestion** | Python (pandas, yfinance) | Collecte de données depuis APIs |
-| **Stockage** | AWS S3 + Amazon Redshift | Data Lake + Data Warehouse |
-| **Transformation** | dbt Core | Modélisation et transformations SQL |
-| **Monitoring** | CloudWatch + Airflow UI | Observabilité et alertes |
+### APIs Used
+1. **Alpha Vantage** - Daily stock prices, sector data
+2. **Yahoo Finance** - Historical prices, company metadata
+3. **FRED API** - Economic indicators, interest rates
 
-## 📈 Sources de Données
-
-- **Yahoo Finance API** : Prix des actions, volumes, données historiques
-- **Alpha Vantage API** : Données sectorielles et métadonnées
-- **FRED API** : Indicateurs macro-économiques (taux, inflation)
+### Data Collected
+- **Stocks**: OHLCV prices, volumes, market cap
+- **Sectors**: GICS sectors (Technology, Healthcare, Finance, etc.)
+- **Indices**: S&P 500, sector indices
+- **Macro**: Fed rates, inflation, VIX
 
 ## 🚀 Quick Start
 
-### Prérequis
-- Python 3.8+
-- AWS Account
-- Terraform installé
+### Prerequisites
+- AWS Account with appropriate permissions
+- Terraform >= 1.0
+- Python 3.9+
+- Git
 
-### POC Locale
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/financial-data-pipeline.git
+   cd financial-data-pipeline
+   ```
+
+2. **Setup environment**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configurations
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Initialize Terraform**
+   ```bash
+   cd terraform
+   terraform init
+   cp terraform.tfvars.example terraform.tfvars
+   # Edit terraform.tfvars with your settings
+   ```
+
+5. **Deploy infrastructure**
+   ```bash
+   make deploy-infrastructure
+   ```
+
+## 📁 Project Structure
+
+```
+financial-data-pipeline/
+├── terraform/          # Infrastructure as Code
+├── airflow/            # DAGs and Airflow configurations
+├── python-scripts/     # Data ingestion and utilities
+├── dbt/               # Data transformations
+├── sql/               # Analytics queries
+├── docs/              # Documentation
+├── monitoring/        # Monitoring and alerting
+└── scripts/           # Automation scripts
+```
+
+## 🔧 Configuration
+
+### Environment Variables
 ```bash
-# Installation
-pip install yfinance pandas numpy
+# AWS Configuration
+AWS_REGION=us-east-1
+AWS_ACCOUNT_ID=123456789012
 
-# Exécution de la POC
-python sectoral_poc.py
+# API Keys
+ALPHA_VANTAGE_API_KEY=your_key_here
+FRED_API_KEY=your_key_here
 
-# Résultats
-ls sectoral_*.csv
+# Database
+REDSHIFT_CLUSTER_IDENTIFIER=financial-data-cluster
+REDSHIFT_DATABASE=financial_data
 ```
 
-### Déploiement Complet
+### Terraform Variables
+Key variables to configure in `terraform.tfvars`:
+- `project_name`: Project identifier
+- `environment`: dev/staging/prod
+- `aws_region`: AWS region
+- `redshift_node_type`: Redshift cluster size
+
+## 📈 Business Use Cases
+
+### 1. Sectoral Performance Analysis
+- Compare sector returns (YTD, 1M, 3M, 1Y)
+- Identify over/under-performing sectors
+- Sector vs macro correlation analysis
+
+### 2. Trend Detection
+- Sectoral momentum (moving averages)
+- Relative volatility by sector
+- Sector rotation signals
+
+### 3. Risk Management
+- VaR calculation by sector
+- Drawdown analysis
+- Optimal diversification
+
+## 🛠️ Key Metrics Calculated
+
+### Returns
+- Daily returns: `(close - close_lag1) / close_lag1`
+- Cumulative returns
+- Sharpe ratio by sector
+- Alpha/Beta vs market
+
+### Volatility
+- 30-day rolling volatility
+- Volatility clustering analysis
+- Risk-adjusted returns
+
+### Correlations
+- Sector vs S&P500 correlation
+- Cross-sector correlations
+- Macro factor exposure
+
+## 📊 Data Models
+
+### Staging Layer
+- `stg_stock_prices`: Clean daily stock prices
+- `stg_sector_data`: Sector classifications
+- `stg_macro_indicators`: Economic indicators
+
+### Marts Layer
+- `mart_sector_performance`: Sector performance metrics
+- `mart_risk_metrics`: Risk and volatility measures
+- `mart_trading_signals`: Investment signals
+
+## 🔄 Daily Pipeline
+
+```
+6:00 AM : Overnight data ingestion
+6:30 AM : Data quality validation
+7:00 AM : dbt transformations
+7:30 AM : Data quality tests
+8:00 AM : Business metrics update
+8:30 AM : Alerts and reports generation
+```
+
+## 🧪 Testing
+
+### Unit Tests
 ```bash
-# Infrastructure
-cd terraform/
-terraform init && terraform apply
-
-# Configuration Airflow
-# Voir DETAILED_README.md pour les étapes complètes
+pytest tests/unit/
 ```
 
-## 📊 Métriques Calculées
-
-### Performance
-- Rendements sectoriels (quotidiens, cumulés)
-- Comparaisons de performance relative
-- Analyse de momentum sectoriel
-
-### Risque
-- Volatilité par secteur (30j, 1an)
-- Ratios de Sharpe sectoriels
-- Value at Risk (VaR)
-
-### Corrélations
-- Matrice de corrélations inter-sectorielles
-- Analyse de diversification
-- Détection de régimes de marché
-
-## 🎯 Cas d'Usage Business
-
-1. **Rotation Sectorielle** : Identification des secteurs sur/sous-performants
-2. **Allocation d'Actifs** : Optimisation de la diversification sectorielle  
-3. **Risk Management** : Monitoring des concentrations de risque
-4. **Trading Signals** : Signaux d'achat/vente basés sur les tendances
-
-## 📁 Structure du Projet
-
-```
-sectoral/
-├── README.md                 # Ce fichier
-├── DETAILED_README.md        # Documentation technique détaillée
-├── sectoral_poc.py          # Proof of Concept
-├── terraform/               # Infrastructure as Code
-├── airflow/                 # DAGs et configuration
-├── dbt/                     # Modèles de transformation
-├── python-scripts/          # Scripts d'ingestion
-└── docs/                    # Documentation supplémentaire
+### Integration Tests
+```bash
+pytest tests/integration/
 ```
 
-## 🏆 Objectifs d'Apprentissage
+### dbt Tests
+```bash
+cd dbt
+dbt test
+```
 
-### Compétences Data Engineering
-- [x] Architecture cloud moderne (AWS)
-- [x] Orchestration de pipelines (Airflow)
-- [x] Infrastructure as Code (Terraform)  
-- [x] Transformations SQL avancées (dbt)
-- [x] Monitoring et observabilité
+## 📚 Documentation
 
-### Compétences Business/Finance
-- [x] Métriques financières avancées
-- [x] Analyse sectorielle professionnelle
-- [x] Risk management quantitatif
-- [x] Insights business actionnables
+- [Architecture Overview](docs/architecture/infrastructure_overview.md)
+- [Setup Guide](docs/setup/installation_guide.md)
+- [API Documentation](docs/api/)
+- [Business Metrics](docs/business/metrics_definitions.md)
 
-## 📊 Résultats de la POC
+## 🚨 Monitoring
 
-Après exécution de la POC, vous obtiendrez :
+### Data Quality Alerts
+- Missing data detection
+- Anomaly detection
+- Schema validation
 
-- **sectoral_raw_data.csv** : Données historiques de 20 actions sur 5 secteurs
-- **sectoral_metrics.csv** : Métriques de performance et risque par secteur
-- **sectoral_correlations.csv** : Matrice de corrélations sectorielles
-- **Résumé exécutif** : Insights business dans le terminal
+### Pipeline Health
+- DAG success rates
+- Processing times
+- Error tracking
 
-## 🔮 Évolutions Futures
+## 🤝 Contributing
 
-- [ ] **Streaming** : Pipeline temps réel avec Kafka
-- [ ] **ML/AI** : Modèles prédictifs de performance sectorielle
-- [ ] **Visualisation** : Dashboard interactif (Streamlit/Plotly)
-- [ ] **APIs** : Exposition des données via FastAPI
-- [ ] **Alternative Data** : Intégration de données ESG, sentiment
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
-## 📝 Documentation
+## 📄 License
 
-- **[Documentation Technique Détaillée](DETAILED_README.md)** : Setup complet, architecture, troubleshooting
-- **[Architecture Decision Records](docs/ADR/)** : Justifications des choix techniques
-- **[API Documentation](docs/api/)** : Endpoints et schémas de données
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributions
+## 👥 Authors
 
-Ce projet est conçu comme un portfolio personnel pour démontrer des compétences en data engineering. Les suggestions d'amélioration sont les bienvenues !
+- Your Name - Initial work
 
-## 📧 Contact
+## 🙏 Acknowledgments
 
-Pour toute question sur ce projet ou pour discuter d'opportunités :
-- **Email** : [michaelgarcia73@gmail.com](mailto:michaelgarcia73@gmail.com)
-- **LinkedIn** : [michaelgarcia838383](https://www.linkedin.com/in/michaelgarcia838383/)
-- **GitHub** : [MichaelG-create](https://github.com/MichaelG-create/)
-- **Portfolio** : [https://michaelg-create.github.io/portfolio/](https://michaelg-create.github.io/portfolio/)
-
-
----
-
-**⭐ N'hésitez pas à star ce repo si vous trouvez le projet intéressant !**
-
-## 🏷️ Tags
-
-`data-engineering` `finance` `aws` `airflow` `dbt` `terraform` `python` `portfolio-project`
+- Alpha Vantage for financial data API
+- Yahoo Finance for market data
+- FRED for economic indicators
