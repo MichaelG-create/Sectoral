@@ -1,3 +1,6 @@
+# project plan files
+*.odt
+
 # Python-generated files
 __pycache__/
 *.py[oc]
@@ -15,3 +18,4 @@ wheels/
 # reports and logs
 *.log
 *.csv
+
