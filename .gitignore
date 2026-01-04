@@ -97,7 +97,6 @@ coverage.xml
 
 # Data files
 *.csv
-*.json
 *.parquet
 *.avro
 data/
