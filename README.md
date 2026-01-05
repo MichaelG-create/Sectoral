@@ -22,11 +22,7 @@ Automated pipeline for analyzing sectoral performance of financial markets to id
 - **Monitoring**: CloudWatch + Airflow UI
 
 ### Data Flow
-```
-Financial APIs → Python Ingestion → S3 Raw Data → dbt Transform → Redshift → Analytics
-                                 ↓
-                        Airflow DAGs (Orchestration)
-```
+![Sectoral workflow](images/sectoral-workflow.png)
 
 ## 📊 Data Sources
 
