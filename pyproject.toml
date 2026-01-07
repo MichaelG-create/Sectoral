@@ -5,71 +5,58 @@ description = "Financial data pipeline - sectoral performance analysis"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+  # core compute / IO
   "pandas>=1.5.0",
   "numpy>=1.24.0",
   "pyarrow>=10.0.0",
+
+  # AWS / databases
   "boto3>=1.26.0",
-  "botocore>=1.29.0",
-  "requests>=2.28.0",
+  "psycopg2-binary>=2.9.0",
+  "sqlalchemy>=1.4.0",
+  "redshift-connector>=2.0.0",
+
+  # config / settings / logging
+  "python-dotenv>=0.19.0",
+  "pyyaml>=6.0",
+  "structlog>=22.3.0",
+
+  # validation / schemas (used at runtime)
+  "pydantic>=1.10.0",
+  "jsonschema>=4.17.0",
+
+  # metrics (if you actually expose runtime metrics)
+  "prometheus-client>=0.15.0",
+  "statsd>=4.0.0",
+
+  # finance APIs actually used in src (keep only the ones you import)
   "yfinance>=0.2.0",
   "alpha-vantage>=2.3.0",
   "fredapi>=0.5.0",
   "beautifulsoup4>=4.11.0",
-  "pydantic>=1.10.0",
-  "jsonschema>=4.17.0",
-  "great-expectations>=0.15.0",
-  "psycopg2-binary>=2.9.0",
-  "sqlalchemy>=1.4.0",
-  "redshift-connector>=2.0.0",
-  "apache-airflow>=2.5.0",
-  "apache-airflow-providers-amazon>=7.0.0",
-  "apache-airflow-providers-postgres>=5.0.0",
-  "dbt-core>=1.4.0",
-  "dbt-redshift>=1.4.0",
-  "structlog>=22.3.0",
-  "prometheus-client>=0.15.0",
-  "statsd>=4.0.0",
-  "python-dotenv>=0.19.0",
-  "pyyaml>=6.0",
-  "configparser>=5.3.0",
-  "pytest>=7.2.0",
-  "pytest-cov>=4.0.0",
-  "pytest-mock>=3.10.0",
-  "moto>=4.1.0",
-  "factory-boy>=3.2.0",
-  "black>=22.12.0",
-  "flake8>=6.0.0",
-  "isort>=5.11.0",
-  "mypy>=0.991",
-  "pre-commit>=2.21.0",
-  "click>=8.1.0",
-  "rich>=13.0.0",
-  "tqdm>=4.64.0",
-  "schedule>=1.1.0",
-  "ta-lib>=0.4.0",
-  "quantlib>=1.29",
-  "scipy>=1.10.0",
-  "scikit-learn>=1.2.0",
-  "matplotlib>=3.6.0",
-  "seaborn>=0.12.0",
-  "plotly>=5.12.0",
-  "jupyter>=1.0.0",
-  "jupyterlab>=3.5.0",
-  "ipython>=8.8.0",
-  "cryptography>=38.0.0",
-  "keyring>=23.13.0",
-  "numba>=0.56.0",
-  "cython>=0.29.0",
-  "sphinx>=5.3.0",
-  "sphinx-rtd-theme>=1.1.0",
-  "mkdocs>=1.4.0",
-  "mkdocs-material>=8.5.0",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "mypy",
-    "types-PyYAML",
+# extras that an end‑user *might* choose when installing from PyPI
+airflow = [
+  "apache-airflow>=2.5.0",
+  "apache-airflow-providers-amazon>=7.0.0",
+  "apache-airflow-providers-postgres>=5.0.0",
+]
+dbt = [
+  "dbt-core>=1.4.0",
+  "dbt-redshift>=1.4.0",
+]
+viz = [
+  "matplotlib>=3.6.0",
+  "seaborn>=0.12.0",
+  "plotly>=5.12.0",
+]
+analytics = [
+  "scipy>=1.10.0",
+  "scikit-learn>=1.2.0",
+  "ta-lib>=0.4.0",
+  "quantlib>=1.29",
 ]
 
 [project.scripts]
@@ -79,8 +66,39 @@ sectoral-poc = "sectoral.cli:main"
 requires = ["uv-build>=0.9.22,<0.10.0"]
 build-backend = "uv_build"
 
+# uv / PEP 735-style dependency groups for *development* only
 [dependency-groups]
 dev = [
-    "pytest-cov>=7.0.0",
-    "types-pyyaml>=6.0.12.20250915",
+  "pytest>=7.2.0",
+  "pytest-cov>=4.0.0",
+  "pytest-mock>=3.10.0",
+  "moto>=4.1.0",
+  "factory-boy>=3.2.0",
+
+  "black>=22.12.0",
+  "flake8>=6.0.0",
+  "isort>=5.11.0",
+  "mypy>=0.991",
+  "pre-commit>=2.21.0",
+
+  "click>=8.1.0",
+  "rich>=13.0.0",
+  "tqdm>=4.64.0",
+  "schedule>=1.1.0",
+
+  "cryptography>=38.0.0",
+  "keyring>=23.13.0",
+  "numba>=0.56.0",
+  "cython>=0.29.0",
+]
+jupyter = [
+  "jupyter>=1.0.0",
+  "jupyterlab>=3.5.0",
+  "ipython>=8.8.0",
+]
+docs = [
+  "sphinx>=5.3.0",
+  "sphinx-rtd-theme>=1.1.0",
+  "mkdocs>=1.4.0",
+  "mkdocs-material>=8.5.0",
 ]
