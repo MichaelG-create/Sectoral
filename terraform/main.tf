@@ -10,7 +10,7 @@ terraform {
       version = "~> 5.0"
     }
   }
-  
+
   backend "s3" {
     # Configuration will be provided via backend config file
     # bucket = "your-terraform-state-bucket"
@@ -26,7 +26,7 @@ terraform {
 locals {
   project_name = "financial-data-pipeline"
   environment  = var.environment
-  
+
   common_tags = {
     Project     = local.project_name
     Environment = local.environment
@@ -48,18 +48,18 @@ data "aws_region" "current" {}
 
 module "iam" {
   source = "./modules/iam"
-  
+
   project_name = local.project_name
   environment  = local.environment
-  
+
   s3_bucket_names = [
     module.s3.raw_data_bucket_name,
     module.s3.processed_data_bucket_name,
     module.s3.logs_bucket_name
   ]
-  
+
   redshift_cluster_identifier = module.redshift.cluster_identifier
-  
+
   tags = local.common_tags
 }
 
@@ -69,15 +69,15 @@ module "iam" {
 
 module "s3" {
   source = "./modules/s3"
-  
+
   project_name = local.project_name
   environment  = local.environment
-  
+
   # Lifecycle configuration
   raw_data_lifecycle_days    = var.raw_data_lifecycle_days
   processed_data_lifecycle_days = var.processed_data_lifecycle_days
   logs_lifecycle_days        = var.logs_lifecycle_days
-  
+
   tags = local.common_tags
 }
 
@@ -87,10 +87,10 @@ module "s3" {
 
 module "redshift" {
   source = "./modules/redshift"
-  
+
   project_name = local.project_name
   environment  = local.environment
-  
+
   # Cluster configuration
   cluster_identifier      = var.redshift_cluster_identifier
   node_type              = var.redshift_node_type
@@ -98,14 +98,14 @@ module "redshift" {
   database_name          = var.redshift_database_name
   master_username        = var.redshift_master_username
   master_password        = var.redshift_master_password
-  
+
   # Security
   vpc_security_group_ids = var.redshift_vpc_security_group_ids
   subnet_group_name      = var.redshift_subnet_group_name
-  
+
   # IAM
   iam_role_arn = module.iam.redshift_service_role_arn
-  
+
   tags = local.common_tags
 }
 
@@ -115,28 +115,28 @@ module "redshift" {
 
 module "mwaa" {
   source = "./modules/mwaa"
-  
+
   project_name = local.project_name
   environment  = local.environment
-  
+
   # MWAA configuration
   airflow_version = var.mwaa_airflow_version
   environment_class = var.mwaa_environment_class
-  
+
   # S3 configuration
   source_bucket_arn = module.s3.airflow_bucket_arn
   dag_s3_path       = var.mwaa_dag_s3_path
-  
+
   # Network configuration
   subnet_ids         = var.mwaa_subnet_ids
   security_group_ids = var.mwaa_security_group_ids
-  
+
   # IAM
   execution_role_arn = module.iam.mwaa_execution_role_arn
-  
+
   # Airflow configuration
   airflow_configuration_options = var.mwaa_airflow_configuration_options
-  
+
   tags = local.common_tags
 }
 

@@ -66,9 +66,20 @@ dependencies = [
   "mkdocs-material>=8.5.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "mypy",
+    "types-PyYAML",
+]
+
 [project.scripts]
 sectoral-poc = "sectoral.cli:main"
 
 [build-system]
 requires = ["uv-build>=0.9.22,<0.10.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "types-pyyaml>=6.0.12.20250915",
+]

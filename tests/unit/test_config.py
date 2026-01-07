@@ -3,6 +3,7 @@ from pathlib import Path
 
 from sectoral.config import SectoralConfig
 
+
 def test_sectoral_config_default_yaml() -> None:
     cfg = SectoralConfig.from_yaml(Path("config/sectoral.yaml"))
     assert "Technology" in cfg.sectors

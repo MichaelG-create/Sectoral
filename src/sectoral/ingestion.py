@@ -1,8 +1,7 @@
-from datetime import datetime
 from typing import Dict, List
 
-import yfinance as yf
 import pandas as pd
+import yfinance as yf
 
 
 def ingest_data(

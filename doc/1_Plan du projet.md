@@ -225,4 +225,3 @@ financial-data-pipeline
 - 08:30 – Génération d’alertes/rapports
 
 Ce projet illustre une expertise complète en data engineering moderne avec un focus business concret sur les marchés financiers.
-

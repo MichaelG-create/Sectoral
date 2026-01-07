@@ -36,4 +36,3 @@
 - MCD – McDonald’s Corporation : restauration rapide
 
 Toutes ces actions font partie du S&P 500 et sont des leaders dans leurs secteurs respectifs, ce qui en fait un échantillon représentatif pour l’analyse sectorielle.
-

@@ -139,7 +139,7 @@ resource "aws_redshift_cluster" "main" {
   node_type              = var.node_type
   number_of_nodes        = var.number_of_nodes
   port                   = var.port
-  
+
   # Network configuration
   cluster_subnet_group_name = aws_redshift_subnet_group.main.name
   vpc_security_group_ids    = [aws_security_group.redshift.id]
@@ -150,17 +150,17 @@ resource "aws_redshift_cluster" "main" {
   automated_snapshot_retention_period = var.backup_retention_period
   skip_final_snapshot                 = var.skip_final_snapshot
   final_snapshot_identifier          = var.skip_final_snapshot ? null : "${var.cluster_identifier}-final-snapshot-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
-  
+
   # Maintenance configuration
   preferred_maintenance_window = var.maintenance_window
-  
+
   # Parameter group
   cluster_parameter_group_name = aws_redshift_parameter_group.main.name
-  
+
   # Encryption
   encrypted  = var.enable_encryption
   kms_key_id = var.enable_encryption ? aws_kms_key.redshift[0].arn : null
-  
+
   # Monitoring
   enable_logging = true
   logging {
@@ -168,7 +168,7 @@ resource "aws_redshift_cluster" "main" {
     bucket_name   = var.logging_bucket_name
     s3_key_prefix = "redshift-logs/"
   }
-  
+
   # IAM roles
   iam_roles = [var.redshift_service_role_arn]
 

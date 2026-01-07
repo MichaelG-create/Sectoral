@@ -46,4 +46,3 @@ Un résumé exécutif est affiché dans le terminal à la fin de l’exécution.
 - Export pour consommation downstream
 
 Une fois la POC validée, on pourra passer à l’architecture complète (Airflow, AWS, dbt, etc.).
-

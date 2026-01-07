@@ -1,4 +1,4 @@
-from typing import Dict, Any, cast
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
@@ -22,7 +22,9 @@ def generate_insights(
     insights: Dict[str, Any] = {}
 
     sector_performance = {s: d["total_return_1y"] for s, d in sector_data.items()}
-    sorted_sectors = sorted(sector_performance.items(), key=lambda x: x[1], reverse=True)
+    sorted_sectors = sorted(
+        sector_performance.items(), key=lambda x: x[1], reverse=True
+    )
     insights["top_performer"] = sorted_sectors[0]
     insights["worst_performer"] = sorted_sectors[-1]
 
@@ -51,8 +53,10 @@ def generate_insights(
             str(correlation_matrix.index[row_idx]),
             str(correlation_matrix.columns[col_idx]),
         ),
-        "correlation": float(  
-            correlation_matrix.iloc[row_idx, col_idx]   # pyright: ignore[reportArgumentType]
+        "correlation": float(
+            correlation_matrix.iloc[
+                row_idx, col_idx
+            ]  # pyright: ignore[reportArgumentType]
         ),
     }
 
@@ -67,11 +71,12 @@ def generate_insights(
             str(correlation_matrix.index[row_min]),
             str(correlation_matrix.columns[col_min]),
         ),
-        "correlation": float(  
-            correlation_matrix.iloc[row_min, col_min] # pyright: ignore[reportArgumentType]
+        "correlation": float(
+            correlation_matrix.iloc[
+                row_min, col_min
+            ]  # pyright: ignore[reportArgumentType]
         ),
     }
-
 
     insights["highest_correlation"] = highest_corr
     insights["lowest_correlation"] = lowest_corr

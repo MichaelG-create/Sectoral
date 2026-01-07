@@ -1,11 +1,11 @@
 import logging
-from typing import Dict, Any
+from typing import Any, Dict
 
-from .config import SectoralConfig, resolve_dates
-from .ingestion import ingest_data
-from .transforms import compute_symbol_metrics, aggregate_by_sector
 from .analytics import compute_correlations, generate_insights
-from .export import export_results, display_summary
+from .config import SectoralConfig, resolve_dates
+from .export import display_summary, export_results
+from .ingestion import ingest_data
+from .transforms import aggregate_by_sector, compute_symbol_metrics
 
 logger = logging.getLogger(__name__)
 

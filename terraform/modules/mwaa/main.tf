@@ -9,7 +9,7 @@
 # S3 bucket for Airflow source code
 resource "aws_s3_bucket" "mwaa_source" {
   bucket = "${var.project_name}-${var.environment}-mwaa-source"
-  
+
   tags = merge(var.tags, {
     Name        = "${var.project_name}-${var.environment}-mwaa-source"
     Environment = var.environment
@@ -61,7 +61,7 @@ resource "aws_s3_object" "requirements" {
 # Upload DAGs to S3
 resource "aws_s3_object" "dags" {
   for_each = var.dags_folder_path != null ? fileset(var.dags_folder_path, "**/*.py") : []
-  
+
   bucket = aws_s3_bucket.mwaa_source.id
   key    = "dags/${each.value}"
   source = "${var.dags_folder_path}/${each.value}"
@@ -73,7 +73,7 @@ resource "aws_s3_object" "dags" {
 # Upload plugins to S3
 resource "aws_s3_object" "plugins" {
   for_each = var.plugins_folder_path != null ? fileset(var.plugins_folder_path, "**/*.py") : []
-  
+
   bucket = aws_s3_bucket.mwaa_source.id
   key    = "plugins/${each.value}"
   source = "${var.plugins_folder_path}/${each.value}"

@@ -4,7 +4,9 @@ import numpy as np
 import pandas as pd
 
 
-def compute_symbol_metrics(raw_data: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
+def compute_symbol_metrics(
+    raw_data: Dict[str, pd.DataFrame]
+) -> Dict[str, pd.DataFrame]:
     print("\n🔄 Calcul des rendements et métriques...")
     out: Dict[str, pd.DataFrame] = {}
 
@@ -49,6 +51,8 @@ def aggregate_by_sector(
                 / (sector_return.std() * np.sqrt(252)),
             }
 
-            print(f"✅ {sector}: Rendement 1Y = {sector_data[sector]['total_return_1y']:.2%}")
+            print(
+                f"✅ {sector}: Rendement 1Y = {sector_data[sector]['total_return_1y']:.2%}"
+            )
 
     return sector_data

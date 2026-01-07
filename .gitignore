@@ -168,5 +168,5 @@ yarn-debug.log*
 yarn-error.log*
 
 
-# script to generate local files architecture 
+# script to generate local files architecture
 architecture_generation/

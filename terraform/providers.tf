@@ -4,7 +4,7 @@
 
 provider "aws" {
   region = var.aws_region
-  
+
   # Default tags applied to all resources
   default_tags {
     tags = {
@@ -24,7 +24,7 @@ provider "aws" {
 provider "aws" {
   alias  = "us_east_1"
   region = "us-east-1"
-  
+
   default_tags {
     tags = {
       Project     = "financial-data-pipeline"
@@ -41,7 +41,7 @@ provider "aws" {
 
 terraform {
   required_version = ">= 1.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"

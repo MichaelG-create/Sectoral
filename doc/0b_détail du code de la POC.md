@@ -196,5 +196,3 @@ def display_summary(self):
 - Secteur le moins risqué
 - Corrélations importantes à surveiller
 - Vue d’ensemble du portefeuille sectoriel
-
-
