@@ -5834,6 +5834,7 @@ dev = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "pytest-cov" },
     { name = "types-pyyaml" },
 ]
 
@@ -5904,7 +5905,10 @@ requires-dist = [
 provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "types-pyyaml", specifier = ">=6.0.12.20250915" }]
+dev = [
+    { name = "pytest-cov", specifier = ">=7.0.0" },
+    { name = "types-pyyaml", specifier = ">=6.0.12.20250915" },
+]
 
 [[package]]
 name = "send2trash"
