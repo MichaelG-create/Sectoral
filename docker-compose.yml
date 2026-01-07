@@ -51,7 +51,7 @@ services:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
-      - ./python-scripts:/opt/airflow/python-scripts
+      - ./src:/opt/airflow/src
     ports:
       - "8080:8080"
     command: webserver
@@ -78,7 +78,7 @@ services:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
-      - ./python-scripts:/opt/airflow/python-scripts
+      - ./src:/opt/airflow/src
     command: scheduler
     networks:
       - pipeline-network
@@ -103,7 +103,7 @@ services:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
-      - ./python-scripts:/opt/airflow/python-scripts
+      - ./src:/opt/airflow/src
     command: celery worker
     networks:
       - pipeline-network
@@ -123,7 +123,7 @@ services:
       - "8888:8888"
     volumes:
       - ./notebooks:/home/jovyan/work
-      - ./python-scripts:/home/jovyan/work/python-scripts
+      - ./src:/home/jovyan/work/src
       - ./config:/home/jovyan/work/config
     networks:
       - pipeline-network
