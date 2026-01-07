@@ -1,17 +1,34 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List
+from pathlib import Path
+from typing import Dict, List, Any
+
+import yaml  # ensure pyyaml is in your dependencies
 
 
-DEFAULT_SECTORS: Dict[str, List[str]] = {
-    "Technology": ["AAPL", "MSFT", "GOOGL", "NVDA"],
-    "Healthcare": ["JNJ", "PFE", "UNH", "ABBV"],
-    "Finance": ["JPM", "BAC", "WFC", "GS"],
-    "Energy": ["XOM", "CVX", "COP", "SLB"],
-    "Consumer": ["AMZN", "TSLA", "HD", "MCD"],
-}
+CONFIG_PATH = Path("config/sectoral.yaml")
 
 
-def resolve_dates(days_back: int = 365) -> tuple[str, str]:
+@dataclass
+class SectoralConfig:
+    sectors: Dict[str, List[str]]
+    days_back: int
+
+    @classmethod
+    def from_yaml(cls, path: Path = CONFIG_PATH) -> "SectoralConfig":
+        with path.open("r", encoding="utf-8") as f:
+            raw: Dict[str, Any] = yaml.safe_load(f) or {}
+
+        sectors = raw.get("sectors", {})
+        window = raw.get("analysis_window", {}) or {}
+        days_back = int(window.get("days_back", 365))
+
+        return cls(sectors=sectors, days_back=days_back)
+
+
+def resolve_dates(days_back: int) -> tuple[str, str]:
     start = (datetime.now() - timedelta(days=days_back)).strftime("%Y-%m-%d")
     end = datetime.now().strftime("%Y-%m-%d")
     return start, end

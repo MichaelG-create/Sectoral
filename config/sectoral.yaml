@@ -1,0 +1,9 @@
+sectors:
+  Technology: ["AAPL", "MSFT", "GOOGL", "NVDA"]
+  Healthcare: ["JNJ", "PFE", "UNH", "ABBV"]
+  Finance: ["JPM", "BAC", "WFC", "GS"]
+  Energy: ["XOM", "CVX", "COP", "SLB"]
+  Consumer: ["AMZN", "TSLA", "HD", "MCD"]
+
+analysis_window:
+  days_back: 365
