@@ -56,7 +56,7 @@ def display_summary(sector_data: Dict[str, dict], insights: Dict[str, dict]) -> 
         f"🥇 Meilleur secteur: {insights['top_performer'][0]} (+{insights['top_performer'][1]:.2%})"
     )
     print(
-        f"🥉 Pire secteur: {insights['worst_performer'][0]} ({insights['worst_performer'][1]:.2%})"
+        f"🥉 Pire secteur: {insights['bottom_performer'][0]} ({insights['bottom_performer'][1]:.2%})"
     )
 
     print("\n⚡ RISQUE")
