@@ -6,35 +6,44 @@ import pandas as pd
 def export_results(
     symbol_data: Dict[str, pd.DataFrame],
     sector_data: Dict[str, dict],
-    correlation_matrix: pd.DataFrame,
+    corr: pd.DataFrame,
+    output_dir: str = "outputs",
 ) -> None:
-    print("\n🔄 Export des résultats...")
+    """
+    Export symbol metrics, sector aggregates, and correlation matrix to CSV.
+    """
+    from pathlib import Path
 
-    all_data = pd.DataFrame()
-    for symbol, data in symbol_data.items():
-        temp_df = data.copy()
-        temp_df["Symbol"] = symbol
-        all_data = pd.concat([all_data, temp_df])
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
 
-    all_data.to_csv("sectoral_raw_data.csv")
-    print("✅ Données brutes exportées: sectoral_raw_data.csv")
+    # Symbol-level metrics
+    all_symbols = []
+    for symbol, df in symbol_data.items():
+        df_copy = df.copy()
+        df_copy["Symbol"] = symbol
+        all_symbols.append(df_copy)
 
-    sector_summary = pd.DataFrame(
-        {
-            sector: {
-                "Total_Return_1Y": data["total_return_1y"],
-                "Volatility_1Y": data["volatility_1y"],
-                "Sharpe_Ratio": data["sharpe_ratio"],
+    if all_symbols:
+        pd.concat(all_symbols).to_csv(out / "symbol_metrics.csv")
+
+    # Sector aggregates
+    sector_rows = []
+    for sector, data in sector_data.items():
+        sector_rows.append(
+            {
+                "Sector": sector,
+                "Cumulative_Return": data.get("cumulative_return"),
+                "Volatility": data.get("volatility"),
+                "Sharpe_Ratio": data.get("sharpe_ratio"),
             }
-            for sector, data in sector_data.items()
-        }
-    ).T
+        )
+    pd.DataFrame(sector_rows).to_csv(out / "sector_aggregates.csv", index=False)
 
-    sector_summary.to_csv("sectoral_metrics.csv")
-    print("✅ Métriques sectorielles exportées: sectoral_metrics.csv")
+    # Correlation matrix
+    corr.to_csv(out / "sector_correlation.csv")
 
-    correlation_matrix.to_csv("sectoral_correlations.csv")
-    print("✅ Corrélations exportées: sectoral_correlations.csv")
+    print(f"\n✅ Exports saved to {out}/")
 
 
 def display_summary(sector_data: Dict[str, dict], insights: Dict[str, dict]) -> None:
