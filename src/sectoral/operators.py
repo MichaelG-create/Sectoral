@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Mapping
 
 from airflow.models import BaseOperator
-from airflow.sdk.definitions.context import Context
 
 from sectoral.analytics import compute_correlations, generate_insights
 from sectoral.config import SectoralConfig, resolve_dates
@@ -36,7 +35,7 @@ class SectoralIngestionOperator(BaseOperator):
         self.config_path = Path(config_path)
         self.output_dir = Path(output_dir)
 
-    def execute(self, context: Context) -> Dict[str, Any]:
+    def execute(self, context: Mapping[str, Any]) -> Dict[str, Any]:
         logger.info("Loading config from %s", self.config_path)
         cfg = SectoralConfig.from_yaml(self.config_path)
         start_date, end_date = resolve_dates(cfg.days_back)
@@ -85,7 +84,7 @@ class SectoralTransformOperator(BaseOperator):
         self.input_dir = Path(input_dir)
         self.output_dir = Path(output_dir)
 
-    def execute(self, context: Context) -> Dict[str, Any]:
+    def execute(self, context: Mapping[str, Any]) -> dict[str, Any]:
         logger.info("Loading config from %s", self.config_path)
         cfg = SectoralConfig.from_yaml(self.config_path)
 
@@ -111,11 +110,11 @@ class SectoralTransformOperator(BaseOperator):
             "insights_count": len(insights),
         }
 
-    def _read_raw_data(self, cfg: SectoralConfig) -> Dict[str, Any]:
+    def _read_raw_data(self, cfg: SectoralConfig) -> dict[str, Any]:
         """Read raw CSV files back into memory."""
         import pandas as pd
 
-        raw = {}
+        raw: dict[str, Any] = {}
         all_symbols = [sym for syms in cfg.sectors.values() for sym in syms]
 
         for symbol in all_symbols:
