@@ -4,8 +4,7 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Mapping
 
-from airflow.models import BaseOperator
-
+from sectoral.airflow_compat import BaseOperator
 from sectoral.analytics import compute_correlations, generate_insights
 from sectoral.config import SectoralConfig, resolve_dates
 from sectoral.export import export_results

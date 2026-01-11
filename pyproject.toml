@@ -102,3 +102,8 @@ docs = [
   "mkdocs>=1.4.0",
   "mkdocs-material>=8.5.0",
 ]
+
+[tool.pytest.ini_options]
+norecursedirs = ["local_s3", ".git", "build", "dist"]  # comma-separated
+# or
+addopts = "--ignore=local_s3"  # single dir
