@@ -1,233 +1,145 @@
-# 📈 Financial Data Pipeline - Sectoral Performance Analysis
+# Sectoral – Financial Data Pipeline
 
-## 🎯 Project Overview
+Automated, production-grade data pipeline for analyzing sectoral performance of financial markets on AWS (S3, Redshift, MWAA) with Airflow orchestration and dbt transformations.
 
-Automated pipeline for analyzing sectoral performance of financial markets to identify investment trends and generate business insights.
+## 1. Project Overview
 
-### Key Features
-- **Real-time data ingestion** from multiple financial APIs
-- **Automated ETL pipeline** with Apache Airflow
-- **Scalable cloud infrastructure** on AWS
-- **Advanced financial metrics** calculation
-- **Sectoral performance analysis** and risk management
+This project ingests market and macro data from multiple financial APIs, stores it in an S3-based data lake, transforms it with dbt into a Redshift warehouse, and exposes curated marts for sector performance, risk and trading signal analysis.
 
-## 🏗️ Architecture
+**Main goals**:
+- Centralize **sector-level** and **symbol-level** market data.
+- Compute advanced metrics (returns, volatility, correlations, VaR, sector rotation signals).
+- Provide a reproducible, IaC-driven deployment on AWS (Terraform + MWAA + Redshift).
 
-### Technology Stack
-- **Orchestration**: Apache Airflow (AWS MWAA)
-- **Infrastructure**: Terraform + AWS
-- **Data Lake**: AWS S3 (Parquet format)
-- **Data Warehouse**: Amazon Redshift
-- **Transformations**: dbt Core
-- **Monitoring**: CloudWatch + Airflow UI
+For detailed technical documentation, see `sectoral-detailed-readme.md`.
 
-### Data Flow
+## 2. Architecture
+
 ![Sectoral workflow](images/sectoral-workflow.png)
 
-## 📊 Data Sources
+High-level data flow:
 
-### APIs Used
-1. **Alpha Vantage** - Daily stock prices, sector data
-2. **Yahoo Finance** - Historical prices, company metadata
-3. **FRED API** - Economic indicators, interest rates
+- External APIs: Alpha Vantage, Yahoo Finance, FRED (macro).
+- Ingestion: Python scripts and Airflow DAGs write raw Parquet to S3.
+- Storage: AWS S3 raw zone.
+- Transformations: dbt Core on top of Redshift.
+- Data warehouse: Amazon Redshift (staging, intermediate, marts).
+- Analytics: SQL queries, dashboards, and exports.
+- Orchestration: Apache Airflow (local and AWS MWAA).
 
-### Data Collected
-- **Stocks**: OHLCV prices, volumes, market cap
-- **Sectors**: GICS sectors (Technology, Healthcare, Finance, etc.)
-- **Indices**: S&P 500, sector indices
-- **Macro**: Fed rates, inflation, VIX
 
-## 🚀 Quick Start
+Core folders:
 
-### Prerequisites
-- AWS Account with appropriate permissions
-- Terraform >= 1.0
+- `src/sectoral/`: application code (ingestion, transforms, CLI, config, operators).
+- `airflow/`: local Airflow setup, DAGs, plugins, config.
+- `dbt/`: dbt project (`models/`, `macros/`, `tests/`, `profiles.yml.example`).
+- `terraform/`: AWS infrastructure (S3, Redshift, MWAA, IAM, environments).
+- `scripts/`: deployment, setup and utilities (e.g. `deploy_airflow.sh`, `test_connections.py`).
+- `tests/`: unit and integration tests for pipeline components and metrics.
+- `images/`: architecture diagrams (e.g. `sectoral-workflow.png`).
+- `outputs/`: exported CSVs and analysis outputs (e.g. `sector_aggregates.csv`).
+
+## 3. Features
+
+- **Data ingestion**
+  - Daily and weekly DAGs for stocks, sectors and macro indicators.
+  - Custom Airflow hooks for Alpha Vantage and Yahoo Finance.
+  - Local S3 emulation for development (`docker-compose.yml` + `.locals3/`).
+
+- **Transformations & metrics**
+  - dbt models for staging, intermediate and marts (e.g. sector performance, risk metrics, trading signals).
+  - Metrics: daily and cumulative returns, rolling volatility, Sharpe ratio, sector correlations, VaR, drawdowns, rotation indicators.
+
+- **Infrastructure & orchestration**
+  - Terraform modules for S3 buckets, Redshift cluster, MWAA environment, IAM roles.
+  - Local Airflow environment via Docker for development and debugging.
+
+- **Quality & monitoring**
+  - dbt tests (not null, accepted values, relationships) and custom tests.
+  - Python tests (unit/integration) for ingestion and transformations.
+  - CloudWatch / Airflow logs in AWS; local logs for dev.
+
+## 4. Getting Started
+
+### 4.1 Prerequisites
+
+Local tools:
+
 - Python 3.9+
+- Terraform 1.0+
+- AWS CLI v2 (`aws configure`)
+- Docker + docker-compose
 - Git
 
-### Installation
+AWS resources (for cloud deployment):
 
-1. **Clone the repository**
+- AWS account and IAM user/role with permissions for S3, Redshift, MWAA, IAM, CloudWatch.
+
+### 4.2 Local setup
+
+1. Clone repo:
    ```bash
-   git clone https://github.com/yourusername/financial-data-pipeline.git
-   cd financial-data-pipeline
+   git clone https://github.com/michaelg-create/sectoral.git
+   cd sectoral
    ```
 
-2. **Setup environment**
+2. Environment:
    ```bash
    cp .env.example .env
-   # Edit .env with your configurations
+   # edit API keys, AWS profile/region, project name, etc.
    ```
 
-3. **Install dependencies**
+3. Python dependencies (uv):
    ```bash
-   pip install -r requirements.txt
+   uv sync
    ```
 
-4. **Initialize Terraform**
+4. Local Airflow (optional for dev):
+   ```bash
+   docker-compose up -d
+   # Airflow at http://localhost:8080
+   ```
+
+5. Run tests:
+   ```bash
+   pytest
+   dbt test --project-dir dbt
+   ```
+
+### 4.3 AWS deployment (Terraform)
+
+1. Configure Terraform variables:
    ```bash
    cd terraform
-   terraform init
-   cp terraform.tfvars.example terraform.tfvars
-   # Edit terraform.tfvars with your settings
+   cp environments/dev.tfvars.example environments/dev.tfvars
+   # edit project name, region, Redshift node type, MWAA config…
    ```
 
-5. **Deploy infrastructure**
+2. Deploy:
    ```bash
-   make deploy-infrastructure
+   terraform init
+   terraform plan  -var-file=environments/dev.tfvars
+   terraform apply -var-file=environments/dev.tfvars
    ```
 
-## 📁 Project Structure
+Outputs include S3 bucket names, Redshift endpoint and MWAA environment details.
 
-```
-financial-data-pipeline/
-├── terraform/          # Infrastructure as Code
-├── airflow/            # DAGs and Airflow configurations
-├── python-scripts/     # Data ingestion and utilities
-├── dbt/               # Data transformations
-├── sql/               # Analytics queries
-├── docs/              # Documentation
-├── monitoring/        # Monitoring and alerting
-└── scripts/           # Automation scripts
-```
+## 5. Usage
 
-## 🔧 Configuration
+- **Airflow DAGs** (local or MWAA):
+  - Daily marketing/sector ingestion: `daily_market_ingestion` (name as defined in `airflow/dags/`).
+  - Weekly sector analysis: `weekly_sector_analysis`.
+  - Data quality checks (dbt tests, validation operators).
 
-### Environment Variables
-```bash
-# AWS Configuration
-AWS_REGION=us-east-1
-AWS_ACCOUNT_ID=123456789012
+- **dbt**
+  ```bash
+  cd dbt
+  # configure profiles.yml using profiles.yml.example
+  dbt seed
+  dbt run
+  dbt test
+  ```
 
-# API Keys
-ALPHA_VANTAGE_API_KEY=your_key_here
-FRED_API_KEY=your_key_here
-
-# Database
-REDSHIFT_CLUSTER_IDENTIFIER=financial-data-cluster
-REDSHIFT_DATABASE=financial_data
-```
-
-### Terraform Variables
-Key variables to configure in `terraform.tfvars`:
-- `project_name`: Project identifier
-- `environment`: dev/staging/prod
-- `aws_region`: AWS region
-- `redshift_node_type`: Redshift cluster size
-
-## 📈 Business Use Cases
-
-### 1. Sectoral Performance Analysis
-- Compare sector returns (YTD, 1M, 3M, 1Y)
-- Identify over/under-performing sectors
-- Sector vs macro correlation analysis
-
-### 2. Trend Detection
-- Sectoral momentum (moving averages)
-- Relative volatility by sector
-- Sector rotation signals
-
-### 3. Risk Management
-- VaR calculation by sector
-- Drawdown analysis
-- Optimal diversification
-
-## 🛠️ Key Metrics Calculated
-
-### Returns
-- Daily returns: `(close - close_lag1) / close_lag1`
-- Cumulative returns
-- Sharpe ratio by sector
-- Alpha/Beta vs market
-
-### Volatility
-- 30-day rolling volatility
-- Volatility clustering analysis
-- Risk-adjusted returns
-
-### Correlations
-- Sector vs S&P500 correlation
-- Cross-sector correlations
-- Macro factor exposure
-
-## 📊 Data Models
-
-### Staging Layer
-- `stg_stock_prices`: Clean daily stock prices
-- `stg_sector_data`: Sector classifications
-- `stg_macro_indicators`: Economic indicators
-
-### Marts Layer
-- `mart_sector_performance`: Sector performance metrics
-- `mart_risk_metrics`: Risk and volatility measures
-- `mart_trading_signals`: Investment signals
-
-## 🔄 Daily Pipeline
-
-```
-6:00 AM : Overnight data ingestion
-6:30 AM : Data quality validation
-7:00 AM : dbt transformations
-7:30 AM : Data quality tests
-8:00 AM : Business metrics update
-8:30 AM : Alerts and reports generation
-```
-
-## 🧪 Testing
-
-### Unit Tests
-```bash
-pytest tests/unit/
-```
-
-### Integration Tests
-```bash
-pytest tests/integration/
-```
-
-### dbt Tests
-```bash
-cd dbt
-dbt test
-```
-
-## 📚 Documentation
-
-- [Architecture Overview](docs/architecture/infrastructure_overview.md)
-- [Setup Guide](docs/setup/installation_guide.md)
-- [API Documentation](docs/api/)
-- [Business Metrics](docs/business/metrics_definitions.md)
-
-## 🚨 Monitoring
-
-### Data Quality Alerts
-- Missing data detection
-- Anomaly detection
-- Schema validation
-
-### Pipeline Health
-- DAG success rates
-- Processing times
-- Error tracking
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Authors
-
-- Your Name - Initial work
-
-## 🙏 Acknowledgments
-
-- Alpha Vantage for financial data API
-- Yahoo Finance for market data
-- FRED for economic indicators
+- **CLI / scripts**
+  - `src/sectoral/cli.py` (lightweight CLI entrypoints; see docstring and usage examples).
+  - `scripts/utilities/test_connections.py` to validate AWS and Redshift connectivity.
