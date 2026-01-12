@@ -1,0 +1,35 @@
+version: 2
+
+sources:
+  - name: sectoral_raw
+    database: airflow
+    schema: public
+    tables:
+      - name: raw_stock_prices
+        columns:
+          - name: symbol
+            tests:
+              - not_null
+          - name: ts
+          - name: open
+          - name: high
+          - name: low
+          - name: close
+          - name: volume
+
+      - name: raw_sector_data
+        columns:
+          - name: symbol
+            tests:
+              - not_null
+          - name: sector
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values:
+                      - 'Technology'
+                      - 'Healthcare'
+                      - 'Finance'
+                      - 'Energy'
+                      - 'Consumer'

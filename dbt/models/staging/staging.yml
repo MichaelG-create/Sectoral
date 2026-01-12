@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: stg_stock_prices
+    columns:
+      - name: symbol
+        tests:
+          - not_null
+      - name: ts
+        tests:
+          - not_null
+      - name: close
+        tests:
+          - not_null
+
+  - name: stg_sector_data
+    columns:
+      - name: symbol
+        tests:
+          - not_null
+      - name: sector
+        tests:
+          - not_null

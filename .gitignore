@@ -166,3 +166,8 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+# script to generate local files architecture
+architecture_generation/
+local_s3/

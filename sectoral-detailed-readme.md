@@ -215,14 +215,14 @@ provider "aws" {
 
 module "s3" {
   source = "./modules/s3"
-  
+
   project_name = var.project_name
   environment  = var.environment
 }
 
 module "redshift" {
   source = "./modules/redshift"
-  
+
   project_name    = var.project_name
   environment     = var.environment
   master_password = var.redshift_password
@@ -230,7 +230,7 @@ module "redshift" {
 
 module "mwaa" {
   source = "./modules/mwaa"
-  
+
   project_name = var.project_name
   environment  = var.environment
   s3_bucket    = module.s3.airflow_bucket_name
@@ -461,7 +461,7 @@ cleaned_prices as (
         adjusted_close::decimal(10,2) as adjusted_close,
         created_at::timestamp as ingestion_timestamp
     from raw_prices
-    where 
+    where
         close_price > 0
         and volume > 0
         and date >= '2020-01-01'
@@ -499,8 +499,8 @@ performance_metrics as (
         dr.daily_return,
         dr.volatility_30d,
         sum(dr.daily_return) over (
-            partition by dr.symbol 
-            order by dr.price_date 
+            partition by dr.symbol
+            order by dr.price_date
             rows unbounded preceding
         ) as cumulative_return
     from daily_returns dr
@@ -516,10 +516,10 @@ select * from performance_metrics
 ```sql
 {% macro calculate_daily_return(price_column) %}
     ({{ price_column }} - lag({{ price_column }}, 1) over (
-        partition by symbol 
+        partition by symbol
         order by price_date
     )) / lag({{ price_column }}, 1) over (
-        partition by symbol 
+        partition by symbol
         order by price_date
     )
 {% endmacro %}
@@ -527,15 +527,15 @@ select * from performance_metrics
 {% macro calculate_volatility(price_column, window_days) %}
     stddev(
         ({{ price_column }} - lag({{ price_column }}, 1) over (
-            partition by symbol 
+            partition by symbol
             order by price_date
         )) / lag({{ price_column }}, 1) over (
-            partition by symbol 
+            partition by symbol
             order by price_date
         )
     ) over (
-        partition by symbol 
-        order by price_date 
+        partition by symbol
+        order by price_date
         rows {{ window_days - 1 }} preceding
     ) * sqrt(252)
 {% endmacro %}
@@ -576,7 +576,7 @@ def publish_data_quality_metrics(success_rate, records_processed):
 def send_alert(message, severity='INFO'):
     sns = boto3.client('sns')
     topic_arn = 'arn:aws:sns:eu-west-1:123456789:SectoralAlerts'
-    
+
     sns.publish(
         TopicArn=topic_arn,
         Message=message,
