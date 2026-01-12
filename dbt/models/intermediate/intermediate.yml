@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: int_sector_aggregates
+    description: "Daily sector-level aggregates (returns, volatility, volume) grouped by sector and timestamp."
+    columns:
+      - name: sector
+        description: "Sector name (e.g., Technology, Finance)"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_sector_data')
+                field: sector
+      - name: ts
+        description: "Timestamp of the aggregation (daily)"
+        tests:
+          - not_null
+      - name: symbol_count
+        description: "Number of distinct symbols in this sector on this date"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 10, 50, 100]  # adjust range as needed
+      - name: avg_daily_return
+        description: "Average daily return across symbols in the sector"
+        tests:
+          - not_null
+      - name: median_daily_return
+        description: "Median daily return across symbols in the sector"
+        tests:
+          - not_null
+      - name: daily_volatility
+        description: "Standard deviation of daily returns in the sector"
+      - name: total_volume
+        description: "Sum of trading volume for the sector on this date"
+        tests:
+          - not_null
+      - name: weighted_avg_price
+        description: "Volume-weighted average price for the sector"
+        tests:
+          - not_null
