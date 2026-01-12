@@ -22,8 +22,8 @@ High-level data flow:
 - External APIs: Alpha Vantage, Yahoo Finance, FRED (macro).
 - Ingestion: Python scripts and Airflow DAGs write raw Parquet to S3.
 - Storage: AWS S3 raw zone.
-- Transformations: dbt Core on top of Redshift.
-- Data warehouse: Amazon Redshift (staging, intermediate, marts).
+- Transformations: dbt Core on top of Redshift (staging → intermediate → marts).
+- Data warehouse: Amazon Redshift (sector and symbol-level tables).
 - Analytics: SQL queries, dashboards, and exports.
 - Orchestration: Apache Airflow (local and AWS MWAA).
 
@@ -55,6 +55,7 @@ Core folders:
   - Local Airflow environment via Docker for development and debugging.
 
 - **Quality & monitoring**
+  Tests are split into `tests/unit` and `tests/integration`, and dbt tests are defined in `dbt/models` YAML files; run `pytest` and `dbt test` for full coverage.
   - dbt tests (not null, accepted values, relationships) and custom tests.
   - Python tests (unit/integration) for ingestion and transformations.
   - CloudWatch / Airflow logs in AWS; local logs for dev.
@@ -143,3 +144,30 @@ Outputs include S3 bucket names, Redshift endpoint and MWAA environment details.
 - **CLI / scripts**
   - `src/sectoral/cli.py` (lightweight CLI entrypoints; see docstring and usage examples).
   - `scripts/utilities/test_connections.py` to validate AWS and Redshift connectivity.
+
+## 6. Roadmap
+
+### Data warehouse (local)
+
+As a data engineer, I want dbt models for sector metrics so I can query performance and showcase a modern data stack.
+
+- **Goal**: `dbt run` + `dbt test` succeed for staging and marts; local Postgres tables are populated.
+- **Scope**:
+  - Staging and intermediate models for sector metrics (e.g. `stg_*`, `int_*`).
+  - Marts for sector performance and risk (e.g. `mart_*`).
+
+#### SEC-US03-T02 – Intermediate & marts models
+
+> “[SEC-US-03] Create intermediate and marts models (int_sector_aggregates, mart_sector_performance).”
+
+- **Status**: Todo
+- **Target date**: 2026-01-22
+- **Priority**: P0
+- **Acceptance criteria**:
+  - `int_sector_aggregates` and `mart_sector_performance` materialize successfully in the local Postgres warehouse.
+  - Core metrics (returns, volatility, Sharpe ratio, sector performance) are queryable from these tables.
+  - `dbt run` and `dbt test` pass for the relevant staging, intermediate and marts models.
+
+These models sit logically in the dbt flow:
+
+`raw (S3 / Postgres) → staging (stg_*) → intermediate (int_sector_aggregates) → marts (mart_sector_performance) → analytics / dashboards.`
