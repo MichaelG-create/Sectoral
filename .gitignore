@@ -170,3 +170,4 @@ yarn-error.log*
 
 # script to generate local files architecture
 architecture_generation/
+local_s3/
