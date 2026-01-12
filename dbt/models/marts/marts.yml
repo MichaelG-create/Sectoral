@@ -24,31 +24,7 @@ models:
         description: "Number of symbols in sector"
         tests:
           - not_null
-      - name: avg_daily_return
-        description: "Average daily return (decimal, e.g. 0.025 = 2.5%)"
-      - name: median_daily_return
-        description: "Median daily return"
-      - name: daily_volatility
-        description: "Daily volatility (std dev of returns)"
-      - name: total_volume
-        description: "Total trading volume for sector"
-      - name: weighted_avg_price
-        description: "Volume-weighted average price"
-      - name: cum_return_from_inception
-        description: "Cumulative return since data inception"
-      - name: ytd_return
-        description: "Year-to-date return"
-      - name: return_1m
-        description: "1-month rolling return"
-      - name: return_3m
-        description: "3-month rolling return"
-      - name: return_1y
-        description: "1-year rolling return"
-      - name: volatility_1y
-        description: "1-year rolling volatility"
-      - name: sharpe_ratio_1y
-        description: "1-year Sharpe ratio (assuming 1.5% risk-free rate)"
       - name: sector_rank_by_return_1y
-        description: "Rank of sector by 1-year return on that date (1 = best)"
+        description: "Rank of sector by 1-year return on that date"
         tests:
           - not_null

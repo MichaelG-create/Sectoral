@@ -5,7 +5,7 @@ models:
     description: "Daily sector-level aggregates (returns, volatility, volume) grouped by sector and timestamp."
     columns:
       - name: sector
-        description: "Sector name (e.g., Technology, Finance)"
+        description: "Sector name"
         tests:
           - not_null
           - relationships:
@@ -20,8 +20,6 @@ models:
         description: "Number of distinct symbols in this sector on this date"
         tests:
           - not_null
-          - accepted_values:
-              values: [1, 2, 3, 4, 5, 10, 50, 100]  # adjust range as needed
       - name: avg_daily_return
         description: "Average daily return across symbols in the sector"
         tests:

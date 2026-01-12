@@ -2,22 +2,46 @@ version: 2
 
 models:
   - name: stg_stock_prices
+    description: "Cleaned stock price data from raw source"
     columns:
       - name: symbol
+        description: "Stock ticker symbol (lowercase)"
         tests:
           - not_null
       - name: ts
+        description: "Timestamp of price"
+        tests:
+          - not_null
+      - name: open
+        description: "Opening price"
+        tests:
+          - not_null
+      - name: high
+        description: "Highest price"
+        tests:
+          - not_null
+      - name: low
+        description: "Lowest price"
         tests:
           - not_null
       - name: close
+        description: "Closing price"
+        tests:
+          - not_null
+      - name: volume
+        description: "Trading volume"
         tests:
           - not_null
 
   - name: stg_sector_data
+    description: "Sector mapping for symbols"
     columns:
       - name: symbol
+        description: "Stock ticker symbol (lowercase)"
         tests:
           - not_null
+          - unique
       - name: sector
+        description: "Sector name"
         tests:
           - not_null
