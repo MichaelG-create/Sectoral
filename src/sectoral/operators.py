@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import Any, Dict, Mapping
 
 import pandas as pd
-import psycopg2
+from sqlalchemy.engine.create import create_engine
+from sqlalchemy.sql.expression import text
 
 from sectoral.airflow_compat import BaseOperator
 from sectoral.analytics import compute_correlations, generate_insights
@@ -135,40 +136,66 @@ class PostgresLoaderOperator(BaseOperator):
 
     ui_color = "#3498db"
 
-    def __init__(self, outputs_dir="/opt/airflow/outputs", **kwargs):
+    def __init__(self, input_dir="/opt/airflow/local_s3", **kwargs):
         super().__init__(**kwargs)
-        self.outputs_dir = outputs_dir
+        self.input_dir = input_dir
 
     def execute(self, context):
-        conn = psycopg2.connect(
-            host="postgres",
-            port="5432",
-            database="airflow",
-            user="airflow",
-            password="airflow",
-        )
+        engine = create_engine("postgresql://airflow:airflow@postgres:5432/airflow")
 
-        # Truncate tables first (idempotent)
-        cursor = conn.cursor()
-        cursor.execute("TRUNCATE TABLE raw_stock_prices, raw_sector_data;")
-        conn.commit()
+        with engine.begin() as conn:
+            # Truncate tables
+            conn.execute(text("TRUNCATE TABLE raw_stock_prices, raw_sector_data;"))
 
-        outputs_path = Path(self.outputs_dir)
+            # Load stock CSVs
+            input_path = Path(self.input_dir)
+            stock_files = list(input_path.glob("*.csv"))
 
-        # Load stock prices
-        stock_files = list(outputs_path.glob("sectoral_stock_prices*.csv"))
-        for csv_file in stock_files:
-            df = pd.read_csv(csv_file)
-            df.to_sql("raw_stock_prices", conn, if_exists="append", index=False)
-            self.log.info(f"✅ Loaded {csv_file.name} ({len(df)} rows)")
+            for csv_file in stock_files:
+                symbol = csv_file.stem.lower()
+                df = pd.read_csv(csv_file)
 
-        # Load sector data
-        sector_file = outputs_path / "sectoral_sector_data.csv"
-        if sector_file.exists():
-            df = pd.read_csv(sector_file)
-            df.to_sql("raw_sector_data", conn, if_exists="append", index=False)
-            self.log.info(f"✅ Loaded {sector_file.name} ({len(df)} rows)")
+                # Prepare data
+                df["symbol"] = symbol
+                df.rename(columns={"Date": "ts"}, inplace=True)
+                df = df[["symbol", "ts", "Open", "High", "Low", "Close", "Volume"]]
+                df.columns = ["symbol", "ts", "open", "high", "low", "close", "volume"]
 
-        conn.commit()
-        conn.close()
-        self.log.info("✅ All CSVs loaded!")
+                # Insert with raw SQL
+                for _, row in df.iterrows():
+                    conn.execute(
+                        text(
+                            """
+                            INSERT INTO raw_stock_prices (symbol, ts, open, high, low, close, volume)
+                            VALUES (:symbol, :ts, :open, :high, :low, :close, :volume)
+                        """
+                        ),
+                        {
+                            "symbol": row["symbol"],
+                            "ts": row["ts"],
+                            "open": float(row["open"]),
+                            "high": float(row["high"]),
+                            "low": float(row["low"]),
+                            "close": float(row["close"]),
+                            "volume": int(row["volume"]),
+                        },
+                    )
+
+                self.log.info(f"✅ Loaded {symbol}: {len(df)} rows")
+
+            # Load sector mappings
+            cfg = SectoralConfig.from_yaml()
+
+            for sector, symbols in cfg.sectors.items():
+                for symbol in symbols:
+                    conn.execute(
+                        text(
+                            "INSERT INTO raw_sector_data (symbol, sector) VALUES (:symbol, :sector)"
+                        ),
+                        {"symbol": symbol.lower(), "sector": sector},
+                    )
+
+            self.log.info("✅ Loaded sector mappings")
+
+        engine.dispose()
+        self.log.info("✅ All data loaded to Postgres!")

@@ -6,11 +6,7 @@ from typing import Any, Dict
 from airflow.operators.bash import BashOperator
 
 from airflow import DAG
-from sectoral.operators import (
-    PostgresLoaderOperator,
-    SectoralIngestionOperator,
-    SectoralTransformOperator,
-)
+from sectoral.operators import PostgresLoaderOperator, SectoralIngestionOperator
 
 default_args: Dict[str, Any] = {
     "owner": "data-engineering",
@@ -38,16 +34,9 @@ with DAG(
         output_dir="/opt/airflow/local_s3",
     )
 
-    transform_task = SectoralTransformOperator(
-        task_id="transform_and_export",
-        config_path="config/sectoral.yaml",
-        input_dir="/opt/airflow/local_s3",
-        output_dir="outputs",
-    )
-
     load_task = PostgresLoaderOperator(
         task_id="load_to_postgres",
-        outputs_dir="/opt/airflow/outputs",
+        input_dir="/opt/airflow/local_s3",
     )
 
     dbt_task = BashOperator(
@@ -55,5 +44,5 @@ with DAG(
         bash_command="cd /opt/airflow/dbt && dbt run && dbt test",
     )
 
-    # Set task dependencies
-    ingest_task >> transform_task >> load_task >> dbt_task
+    # Simplified dependencies: ingest → load → dbt
+    ingest_task >> load_task >> dbt_task
