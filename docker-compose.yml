@@ -12,6 +12,7 @@ x-airflow-common:
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+    XDG_CACHE_HOME: /tmp/.cache
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/logs:/opt/airflow/logs
@@ -19,6 +20,8 @@ x-airflow-common:
     - ./config:/opt/airflow/config
     - ./outputs:/opt/airflow/outputs
     - ./local_s3:/opt/airflow/local_s3  # Changed from named volume to bind mount
+    - ./src:/opt/airflow/src  # for dev only, drop for production as there's a copy in the image
+    - ./dbt:/opt/airflow/dbt
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -82,9 +85,8 @@ services:
       - -c
       - |
         mkdir -p /opt/airflow/logs /opt/airflow/dags /opt/airflow/plugins /opt/airflow/local_s3
-        # Set ownership to Airflow user (UID 50000) with group 0
-        chown -R 50000:0 /opt/airflow/local_s3 /opt/airflow/logs /opt/airflow/dags /opt/airflow/plugins
-        # Set permissions: 750 = rwxr-x--- (owner read/write/execute, group read/execute, others nothing)
+        # Only chown local_s3 (writable by airflow user)
+        chown -R 50000:0 /opt/airflow/local_s3
         chmod -R 770 /opt/airflow/local_s3
         exec /entrypoint airflow version
     environment:
