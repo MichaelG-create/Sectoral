@@ -4,6 +4,9 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Mapping
 
+import pandas as pd
+import psycopg2
+
 from sectoral.airflow_compat import BaseOperator
 from sectoral.analytics import compute_correlations, generate_insights
 from sectoral.config import SectoralConfig, resolve_dates
@@ -125,3 +128,47 @@ class SectoralTransformOperator(BaseOperator):
                 logger.warning("Missing raw data for %s", symbol)
 
         return raw
+
+
+class PostgresLoaderOperator(BaseOperator):
+    """Load CSV files to Postgres raw tables"""
+
+    ui_color = "#3498db"
+
+    def __init__(self, outputs_dir="/opt/airflow/outputs", **kwargs):
+        super().__init__(**kwargs)
+        self.outputs_dir = outputs_dir
+
+    def execute(self, context):
+        conn = psycopg2.connect(
+            host="postgres",
+            port="5432",
+            database="airflow",
+            user="airflow",
+            password="airflow",
+        )
+
+        # Truncate tables first (idempotent)
+        cursor = conn.cursor()
+        cursor.execute("TRUNCATE TABLE raw_stock_prices, raw_sector_data;")
+        conn.commit()
+
+        outputs_path = Path(self.outputs_dir)
+
+        # Load stock prices
+        stock_files = list(outputs_path.glob("sectoral_stock_prices*.csv"))
+        for csv_file in stock_files:
+            df = pd.read_csv(csv_file)
+            df.to_sql("raw_stock_prices", conn, if_exists="append", index=False)
+            self.log.info(f"✅ Loaded {csv_file.name} ({len(df)} rows)")
+
+        # Load sector data
+        sector_file = outputs_path / "sectoral_sector_data.csv"
+        if sector_file.exists():
+            df = pd.read_csv(sector_file)
+            df.to_sql("raw_sector_data", conn, if_exists="append", index=False)
+            self.log.info(f"✅ Loaded {sector_file.name} ({len(df)} rows)")
+
+        conn.commit()
+        conn.close()
+        self.log.info("✅ All CSVs loaded!")

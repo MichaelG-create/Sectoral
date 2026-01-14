@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   # core compute / IO
-  "pandas>=1.5.0",
+  "pandas>=2.2.0",
   "numpy>=1.24.0",
   "pyarrow>=10.0.0",
 
@@ -21,23 +21,17 @@ dependencies = [
   "pyyaml>=6.0",
   "structlog>=22.3.0",
 
-  # validation / schemas (used at runtime)
+  # validation / schemas
   "pydantic>=1.10.0",
   "jsonschema>=4.17.0",
 
-  # metrics (if you actually expose runtime metrics)
-  "prometheus-client>=0.15.0",
-  "statsd>=4.0.0",
-
-  # finance APIs actually used in src (keep only the ones you import)
+  # finance APIs
   "yfinance>=0.2.0",
   "alpha-vantage>=2.3.0",
   "fredapi>=0.5.0",
-  "beautifulsoup4>=4.11.0",
 ]
 
 [project.optional-dependencies]
-# extras that an end‑user *might* choose when installing from PyPI
 airflow = [
   "apache-airflow>=2.5.0",
   "apache-airflow-providers-amazon>=7.0.0",
@@ -45,18 +39,16 @@ airflow = [
 ]
 dbt = [
   "dbt-core>=1.4.0",
-  "dbt-redshift>=1.4.0",
+  "dbt-postgres>=1.4.0",  # ← For local Postgres
+  # "dbt-redshift>=1.4.0", # later for Redshift instead of Postgres
 ]
-viz = [
-  "matplotlib>=3.6.0",
-  "seaborn>=0.12.0",
-  "plotly>=5.12.0",
+dashboard = [
+  "streamlit==1.28.1",
+  "plotly==5.17.0",
 ]
 analytics = [
   "scipy>=1.10.0",
   "scikit-learn>=1.2.0",
-  "ta-lib>=0.4.0",
-  "quantlib>=1.29",
 ]
 
 [project.scripts]
@@ -66,7 +58,6 @@ sectoral-poc = "sectoral.cli:main"
 requires = ["uv-build>=0.9.22,<0.10.0"]
 build-backend = "uv_build"
 
-# uv / PEP 735-style dependency groups for *development* only
 [dependency-groups]
 dev = [
   "pytest>=7.2.0",
@@ -74,22 +65,11 @@ dev = [
   "pytest-mock>=3.10.0",
   "moto>=4.1.0",
   "factory-boy>=3.2.0",
-
   "black>=22.12.0",
   "flake8>=6.0.0",
   "isort>=5.11.0",
   "mypy>=0.991",
   "pre-commit>=2.21.0",
-
-  "click>=8.1.0",
-  "rich>=13.0.0",
-  "tqdm>=4.64.0",
-  "schedule>=1.1.0",
-
-  "cryptography>=38.0.0",
-  "keyring>=23.13.0",
-  "numba>=0.56.0",
-  "cython>=0.29.0",
 ]
 jupyter = [
   "jupyter>=1.0.0",
@@ -104,6 +84,4 @@ docs = [
 ]
 
 [tool.pytest.ini_options]
-norecursedirs = ["local_s3", ".git", "build", "dist"]  # comma-separated
-# or
-addopts = "--ignore=local_s3"  # single dir
+addopts = "--ignore=local_s3"

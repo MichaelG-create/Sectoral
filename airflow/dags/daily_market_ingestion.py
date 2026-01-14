@@ -3,8 +3,14 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Any, Dict
 
+from airflow.operators.bash import BashOperator
+
 from airflow import DAG
-from sectoral.operators import SectoralIngestionOperator, SectoralTransformOperator
+from sectoral.operators import (
+    PostgresLoaderOperator,
+    SectoralIngestionOperator,
+    SectoralTransformOperator,
+)
 
 default_args: Dict[str, Any] = {
     "owner": "data-engineering",
@@ -39,4 +45,15 @@ with DAG(
         output_dir="outputs",
     )
 
-    ingest_task >> transform_task
+    load_task = PostgresLoaderOperator(
+        task_id="load_to_postgres",
+        outputs_dir="/opt/airflow/outputs",
+    )
+
+    dbt_task = BashOperator(
+        task_id="run_dbt",
+        bash_command="cd /opt/airflow/dbt && dbt run && dbt test",
+    )
+
+    # Set task dependencies
+    ingest_task >> transform_task >> load_task >> dbt_task
