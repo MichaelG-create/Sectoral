@@ -43,7 +43,7 @@ dbt = [
   # "dbt-redshift>=1.4.0", # later for Redshift instead of Postgres
 ]
 dashboard = [
-  "streamlit==1.28.1",
+  "streamlit==1.37.0",
   "plotly==5.17.0",
 ]
 analytics = [
