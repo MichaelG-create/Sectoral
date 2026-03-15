@@ -39,7 +39,7 @@ sector_aggregates as (
         ts,
         count(distinct symbol) as symbol_count,
         avg(daily_return) as avg_daily_return,
-        percentile_cont(0.5) within group (order by daily_return) as median_daily_return,
+        approx_quantiles(daily_return, 100)[OFFSET(50)] as median_daily_return,
         stddev(daily_return) as daily_volatility,
         sum(volume) as total_volume,
         sum(close * volume) / sum(volume) as weighted_avg_price

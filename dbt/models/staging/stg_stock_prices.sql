@@ -17,13 +17,13 @@ with raw as (
 cleaned as (
 
     select
-        lower(symbol)                          as symbol,
-        cast(ts as timestamp)                  as ts,
-        cast(open  as numeric(18, 6))          as open,
-        cast(high  as numeric(18, 6))          as high,
-        cast(low   as numeric(18, 6))          as low,
-        cast(close as numeric(18, 6))          as close,
-        cast(volume as bigint)                 as volume
+        lower(symbol)            as symbol,
+        cast(ts as timestamp)    as ts,
+        cast(open  as numeric)   as open,
+        cast(high  as numeric)   as high,
+        cast(low   as numeric)   as low,
+        cast(close as numeric)   as close,
+        cast(volume as int64)    as volume
     from raw
     where close is not null
 

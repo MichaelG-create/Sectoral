@@ -23,7 +23,7 @@ with_cumulative_return as (
         )) - 1 as cum_return_from_inception,
         -- YTD cumulative return
         exp(sum(ln(1 + avg_daily_return)) over (
-            partition by sector, date_trunc('year', ts)
+            partition by sector, DATE_TRUNC(DATE(ts), YEAR)
             order by ts
             rows between unbounded preceding and current row
         )) - 1 as ytd_return
@@ -99,22 +99,18 @@ with_sharpe_ratio as (
 )
 
 select
-    sector,
     ts,
-    cast(ts as date) as date,
+    date(ts) as date,
+    sector,
     symbol_count,
-    round(avg_daily_return::numeric, 6) as avg_daily_return,
-    round(median_daily_return::numeric, 6) as median_daily_return,
-    round(daily_volatility::numeric, 6) as daily_volatility,
-    total_volume,
-    round(weighted_avg_price::numeric, 2) as weighted_avg_price,
-    round(cum_return_from_inception::numeric, 4) as cum_return_from_inception,
-    round(ytd_return::numeric, 4) as ytd_return,
-    round(return_1m::numeric, 4) as return_1m,
-    round(return_3m::numeric, 4) as return_3m,
-    round(return_1y::numeric, 4) as return_1y,
-    round(volatility_1y::numeric, 4) as volatility_1y,
-    round(sharpe_ratio_1y::numeric, 4) as sharpe_ratio_1y,
+    round(CAST(weighted_avg_price AS NUMERIC), 2) as weighted_avg_price,
+    round(CAST(cum_return_from_inception AS NUMERIC), 4) as cum_return_from_inception,
+    round(CAST(ytd_return AS NUMERIC), 4) as ytd_return,
+    round(CAST(return_1m AS NUMERIC), 4) as return_1m,
+    round(CAST(return_3m AS NUMERIC), 4) as return_3m,
+    round(CAST(return_1y AS NUMERIC), 4) as return_1y,
+    round(CAST(volatility_1y AS NUMERIC), 4) as volatility_1y,
+    round(CAST(sharpe_ratio_1y AS NUMERIC), 4) as sharpe_ratio_1y,
     sector_rank_by_return_1y
 from with_sharpe_ratio
 order by ts desc, sector
