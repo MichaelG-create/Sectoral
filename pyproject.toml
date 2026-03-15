@@ -17,6 +17,11 @@ dependencies = [
   "psycopg2-binary>=2.9.0",
   "sqlalchemy>=1.4.0",
 
+  # dbt
+  "dbt-core>=1.4.0",
+  "dbt-postgres>=1.4.0",
+  "dbt-bigquery>=1.4.0",
+
   # config / settings / logging
   "python-dotenv>=0.19.0",
   "pyyaml>=6.0",
@@ -38,11 +43,6 @@ airflow = [
   "apache-airflow>=2.5.0",
   "apache-airflow-providers-google>=10.0.0",
   "apache-airflow-providers-postgres>=5.0.0",
-]
-dbt = [
-  "dbt-core>=1.4.0",
-  "dbt-postgres>=1.4.0",
-  "dbt-bigquery>=1.4.0",
 ]
 dashboard = [
   "streamlit==1.37.0",
@@ -84,11 +84,6 @@ docs = [
   "sphinx-rtd-theme>=1.1.0",
   "mkdocs>=1.4.0",
   "mkdocs-material>=8.5.0",
-]
-dbt = [
-  "dbt-core>=1.4.0",
-  "dbt-postgres>=1.4.0",
-  "dbt-bigquery>=1.4.0",
 ]
 
 [tool.pytest.ini_options]

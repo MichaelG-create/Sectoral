@@ -7080,6 +7080,9 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "alpha-vantage" },
+    { name = "dbt-bigquery" },
+    { name = "dbt-core" },
+    { name = "dbt-postgres" },
     { name = "fredapi" },
     { name = "google-cloud-bigquery" },
     { name = "google-cloud-secret-manager" },
@@ -7112,18 +7115,8 @@ dashboard = [
     { name = "plotly" },
     { name = "streamlit" },
 ]
-dbt = [
-    { name = "dbt-bigquery" },
-    { name = "dbt-core" },
-    { name = "dbt-postgres" },
-]
 
 [package.dev-dependencies]
-dbt = [
-    { name = "dbt-bigquery" },
-    { name = "dbt-core" },
-    { name = "dbt-postgres" },
-]
 dev = [
     { name = "black" },
     { name = "factory-boy" },
@@ -7154,9 +7147,9 @@ requires-dist = [
     { name = "apache-airflow", marker = "extra == 'airflow'", specifier = ">=2.5.0" },
     { name = "apache-airflow-providers-google", marker = "extra == 'airflow'", specifier = ">=10.0.0" },
     { name = "apache-airflow-providers-postgres", marker = "extra == 'airflow'", specifier = ">=5.0.0" },
-    { name = "dbt-bigquery", marker = "extra == 'dbt'", specifier = ">=1.4.0" },
-    { name = "dbt-core", marker = "extra == 'dbt'", specifier = ">=1.4.0" },
-    { name = "dbt-postgres", marker = "extra == 'dbt'", specifier = ">=1.4.0" },
+    { name = "dbt-bigquery", specifier = ">=1.4.0" },
+    { name = "dbt-core", specifier = ">=1.4.0" },
+    { name = "dbt-postgres", specifier = ">=1.4.0" },
     { name = "fredapi", specifier = ">=0.5.0" },
     { name = "google-cloud-bigquery", specifier = ">=3.0.0" },
     { name = "google-cloud-secret-manager", specifier = ">=2.0.0" },
@@ -7177,14 +7170,9 @@ requires-dist = [
     { name = "structlog", specifier = ">=22.3.0" },
     { name = "yfinance", specifier = ">=0.2.0" },
 ]
-provides-extras = ["airflow", "dbt", "dashboard", "analytics"]
+provides-extras = ["airflow", "dashboard", "analytics"]
 
 [package.metadata.requires-dev]
-dbt = [
-    { name = "dbt-bigquery", specifier = ">=1.4.0" },
-    { name = "dbt-core", specifier = ">=1.4.0" },
-    { name = "dbt-postgres", specifier = ">=1.4.0" },
-]
 dev = [
     { name = "black", specifier = ">=22.12.0" },
     { name = "factory-boy", specifier = ">=3.2.0" },
