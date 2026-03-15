@@ -2,8 +2,8 @@
 # Provider Configuration
 # ===============================
 
-provider "aws" {
-  region = var.aws_region
+provider "gcp" {
+  region = var.gcp_region
 
   # Default tags applied to all resources
   default_tags {
@@ -21,7 +21,7 @@ provider "aws" {
 # ===============================
 
 # Provider for us-east-1 (required for CloudFront, Route53, etc.)
-provider "aws" {
+provider "gcp" {
   alias  = "us_east_1"
   region = "us-east-1"
 
@@ -43,8 +43,8 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
+    gcp = {
+      source  = "hashicorp/gcp"
       version = "~> 5.0"
     }
     random = {

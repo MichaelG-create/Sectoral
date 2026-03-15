@@ -31,12 +31,12 @@ with DAG(
     ingest_task = SectoralIngestionOperator(
         task_id="ingest_stock_data",
         config_path="config/sectoral.yaml",
-        output_dir="/opt/airflow/local_s3",
+        output_dir="/opt/airflow/local_gcs",
     )
 
     load_task = PostgresLoaderOperator(
         task_id="load_to_postgres",
-        input_dir="/opt/airflow/local_s3",
+        input_dir="/opt/airflow/local_gcs",
     )
 
     dbt_task = BashOperator(

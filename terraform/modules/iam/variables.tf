@@ -16,24 +16,24 @@ variable "environment" {
   type        = string
 }
 
-variable "aws_region" {
-  description = "AWS region"
+variable "gcp_region" {
+  description = "GCP region"
   type        = string
 }
 
-variable "aws_account_id" {
-  description = "AWS account ID"
+variable "gcp_account_id" {
+  description = "GCP account ID"
   type        = string
 }
 
-variable "s3_bucket_arns" {
-  description = "List of S3 bucket ARNs for access permissions"
+variable "gcs_bucket_arns" {
+  description = "List of GCS bucket ARNs for access permissions"
   type        = list(string)
   default     = []
 }
 
-variable "redshift_cluster_arn" {
-  description = "ARN of the Redshift cluster"
+variable "bigquery_cluster_arn" {
+  description = "ARN of the BigQuery cluster"
   type        = string
   default     = null
 }
@@ -44,7 +44,7 @@ variable "secrets_manager_arns" {
   default     = []
 }
 
-variable "lambda_vpc_access" {
+variable "cloudfunctions_vpc_access" {
   description = "Whether Lambda functions need VPC access"
   type        = bool
   default     = false
@@ -57,7 +57,7 @@ variable "create_api_gateway_role" {
 }
 
 variable "trusted_account_ids" {
-  description = "List of trusted AWS account IDs for cross-account access"
+  description = "List of trusted GCP account IDs for cross-account access"
   type        = list(string)
   default     = []
 }
@@ -75,7 +75,7 @@ variable "enable_cloudtrail_access" {
 }
 
 variable "enable_config_access" {
-  description = "Enable AWS Config access for compliance"
+  description = "Enable GCP Config access for compliance"
   type        = bool
   default     = false
 }
@@ -98,19 +98,19 @@ variable "data_lake_additional_actions" {
   default     = []
 }
 
-variable "lambda_additional_actions" {
-  description = "Additional actions for lambda role"
+variable "cloudfunctions_additional_actions" {
+  description = "Additional actions for cloudfunctions role"
   type        = list(string)
   default     = []
 }
 
-variable "redshift_additional_actions" {
-  description = "Additional actions for Redshift role"
+variable "bigquery_additional_actions" {
+  description = "Additional actions for BigQuery role"
   type        = list(string)
   default     = []
 }
 
-variable "glue_additional_actions" {
+variable "dataflow_additional_actions" {
   description = "Additional actions for Glue role"
   type        = list(string)
   default     = []
@@ -159,7 +159,7 @@ variable "enable_vpc_flow_logs" {
 }
 
 variable "vpc_flow_logs_bucket_arn" {
-  description = "S3 bucket ARN for VPC Flow Logs"
+  description = "GCS bucket ARN for VPC Flow Logs"
   type        = string
   default     = null
 }
@@ -170,7 +170,7 @@ variable "enable_data_quality_checks" {
   default     = true
 }
 
-variable "data_quality_lambda_arns" {
+variable "data_quality_cloudfunctions_arns" {
   description = "List of Lambda ARNs for data quality checks"
   type        = list(string)
   default     = []

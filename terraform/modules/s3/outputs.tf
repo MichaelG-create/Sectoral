@@ -1,5 +1,5 @@
 # =============================================================================
-# S3 MODULE OUTPUTS - Financial Data Pipeline
+# GCS MODULE OUTPUTS - Financial Data Pipeline
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -7,28 +7,28 @@
 # -----------------------------------------------------------------------------
 
 output "raw_bucket_name" {
-  description = "Name of the raw data S3 bucket"
-  value       = aws_s3_bucket.raw_data.bucket
+  description = "Name of the raw data GCS bucket"
+  value       = gcs_bucket.raw_data.bucket
 }
 
 output "raw_bucket_arn" {
-  description = "ARN of the raw data S3 bucket"
-  value       = aws_s3_bucket.raw_data.arn
+  description = "ARN of the raw data GCS bucket"
+  value       = gcs_bucket.raw_data.arn
 }
 
 output "raw_bucket_id" {
-  description = "ID of the raw data S3 bucket"
-  value       = aws_s3_bucket.raw_data.id
+  description = "ID of the raw data GCS bucket"
+  value       = gcs_bucket.raw_data.id
 }
 
 output "raw_bucket_region" {
-  description = "Region of the raw data S3 bucket"
-  value       = aws_s3_bucket.raw_data.region
+  description = "Region of the raw data GCS bucket"
+  value       = gcs_bucket.raw_data.region
 }
 
 output "raw_bucket_domain_name" {
-  description = "Domain name of the raw data S3 bucket"
-  value       = aws_s3_bucket.raw_data.bucket_domain_name
+  description = "Domain name of the raw data GCS bucket"
+  value       = gcs_bucket.raw_data.bucket_domain_name
 }
 
 # -----------------------------------------------------------------------------
@@ -36,28 +36,28 @@ output "raw_bucket_domain_name" {
 # -----------------------------------------------------------------------------
 
 output "processed_bucket_name" {
-  description = "Name of the processed data S3 bucket"
-  value       = aws_s3_bucket.processed_data.bucket
+  description = "Name of the processed data GCS bucket"
+  value       = gcs_bucket.processed_data.bucket
 }
 
 output "processed_bucket_arn" {
-  description = "ARN of the processed data S3 bucket"
-  value       = aws_s3_bucket.processed_data.arn
+  description = "ARN of the processed data GCS bucket"
+  value       = gcs_bucket.processed_data.arn
 }
 
 output "processed_bucket_id" {
-  description = "ID of the processed data S3 bucket"
-  value       = aws_s3_bucket.processed_data.id
+  description = "ID of the processed data GCS bucket"
+  value       = gcs_bucket.processed_data.id
 }
 
 output "processed_bucket_region" {
-  description = "Region of the processed data S3 bucket"
-  value       = aws_s3_bucket.processed_data.region
+  description = "Region of the processed data GCS bucket"
+  value       = gcs_bucket.processed_data.region
 }
 
 output "processed_bucket_domain_name" {
-  description = "Domain name of the processed data S3 bucket"
-  value       = aws_s3_bucket.processed_data.bucket_domain_name
+  description = "Domain name of the processed data GCS bucket"
+  value       = gcs_bucket.processed_data.bucket_domain_name
 }
 
 # -----------------------------------------------------------------------------
@@ -65,28 +65,28 @@ output "processed_bucket_domain_name" {
 # -----------------------------------------------------------------------------
 
 output "logs_bucket_name" {
-  description = "Name of the logs S3 bucket"
-  value       = aws_s3_bucket.logs.bucket
+  description = "Name of the logs GCS bucket"
+  value       = gcs_bucket.logs.bucket
 }
 
 output "logs_bucket_arn" {
-  description = "ARN of the logs S3 bucket"
-  value       = aws_s3_bucket.logs.arn
+  description = "ARN of the logs GCS bucket"
+  value       = gcs_bucket.logs.arn
 }
 
 output "logs_bucket_id" {
-  description = "ID of the logs S3 bucket"
-  value       = aws_s3_bucket.logs.id
+  description = "ID of the logs GCS bucket"
+  value       = gcs_bucket.logs.id
 }
 
 output "logs_bucket_region" {
-  description = "Region of the logs S3 bucket"
-  value       = aws_s3_bucket.logs.region
+  description = "Region of the logs GCS bucket"
+  value       = gcs_bucket.logs.region
 }
 
 output "logs_bucket_domain_name" {
-  description = "Domain name of the logs S3 bucket"
-  value       = aws_s3_bucket.logs.bucket_domain_name
+  description = "Domain name of the logs GCS bucket"
+  value       = gcs_bucket.logs.bucket_domain_name
 }
 
 # -----------------------------------------------------------------------------
@@ -94,52 +94,52 @@ output "logs_bucket_domain_name" {
 # -----------------------------------------------------------------------------
 
 output "dags_bucket_name" {
-  description = "Name of the DAGs S3 bucket"
-  value       = aws_s3_bucket.dags.bucket
+  description = "Name of the DAGs GCS bucket"
+  value       = gcs_bucket.dags.bucket
 }
 
 output "dags_bucket_arn" {
-  description = "ARN of the DAGs S3 bucket"
-  value       = aws_s3_bucket.dags.arn
+  description = "ARN of the DAGs GCS bucket"
+  value       = gcs_bucket.dags.arn
 }
 
 output "dags_bucket_id" {
-  description = "ID of the DAGs S3 bucket"
-  value       = aws_s3_bucket.dags.id
+  description = "ID of the DAGs GCS bucket"
+  value       = gcs_bucket.dags.id
 }
 
 output "dags_bucket_region" {
-  description = "Region of the DAGs S3 bucket"
-  value       = aws_s3_bucket.dags.region
+  description = "Region of the DAGs GCS bucket"
+  value       = gcs_bucket.dags.region
 }
 
 output "dags_bucket_domain_name" {
-  description = "Domain name of the DAGs S3 bucket"
-  value       = aws_s3_bucket.dags.bucket_domain_name
+  description = "Domain name of the DAGs GCS bucket"
+  value       = gcs_bucket.dags.bucket_domain_name
 }
 
 # -----------------------------------------------------------------------------
 # Bucket URLs and Paths
 # -----------------------------------------------------------------------------
 
-output "raw_data_s3_path" {
-  description = "S3 path for raw data bucket"
-  value       = "s3://${aws_s3_bucket.raw_data.bucket}"
+output "raw_data_gcs_path" {
+  description = "GCS path for raw data bucket"
+  value       = "gcp://${gcs_bucket.raw_data.bucket}"
 }
 
-output "processed_data_s3_path" {
-  description = "S3 path for processed data bucket"
-  value       = "s3://${aws_s3_bucket.processed_data.bucket}"
+output "processed_data_gcs_path" {
+  description = "GCS path for processed data bucket"
+  value       = "gcp://${gcs_bucket.processed_data.bucket}"
 }
 
-output "logs_s3_path" {
-  description = "S3 path for logs bucket"
-  value       = "s3://${aws_s3_bucket.logs.bucket}"
+output "logs_gcs_path" {
+  description = "GCS path for logs bucket"
+  value       = "gcp://${gcs_bucket.logs.bucket}"
 }
 
-output "dags_s3_path" {
-  description = "S3 path for DAGs bucket"
-  value       = "s3://${aws_s3_bucket.dags.bucket}"
+output "dags_gcs_path" {
+  description = "GCS path for DAGs bucket"
+  value       = "gcp://${gcs_bucket.dags.bucket}"
 }
 
 # -----------------------------------------------------------------------------
@@ -148,12 +148,12 @@ output "dags_s3_path" {
 
 output "raw_data_bucket_policy" {
   description = "Policy document for raw data bucket"
-  value       = aws_s3_bucket_policy.raw_data_policy.policy
+  value       = gcs_bucket_policy.raw_data_policy.policy
 }
 
 output "processed_data_bucket_policy" {
   description = "Policy document for processed data bucket"
-  value       = aws_s3_bucket_policy.processed_data_policy.policy
+  value       = gcs_bucket_policy.processed_data_policy.policy
 }
 
 # -----------------------------------------------------------------------------
@@ -161,16 +161,16 @@ output "processed_data_bucket_policy" {
 # -----------------------------------------------------------------------------
 
 output "cloudwatch_event_rule_arn" {
-  description = "ARN of the CloudWatch event rule for S3 data arrival"
-  value       = aws_cloudwatch_event_rule.s3_data_arrival.arn
+  description = "ARN of the CloudWatch event rule for GCS data arrival"
+  value       = gcp_cloudwatch_event_rule.gcs_data_arrival.arn
 }
 
 output "inventory_configuration" {
-  description = "S3 inventory configuration details"
+  description = "GCS inventory configuration details"
   value = {
     raw_data_inventory = {
-      name   = aws_s3_bucket_inventory.raw_data_inventory.name
-      bucket = aws_s3_bucket_inventory.raw_data_inventory.bucket
+      name   = gcs_bucket_inventory.raw_data_inventory.name
+      bucket = gcs_bucket_inventory.raw_data_inventory.bucket
     }
   }
 }
@@ -183,16 +183,16 @@ output "data_partitioning_paths" {
   description = "Standard data partitioning paths"
   value = {
     stock_data = {
-      daily   = "s3://${aws_s3_bucket.raw_data.bucket}/stock-data/year=%Y/month=%m/day=%d/"
-      hourly  = "s3://${aws_s3_bucket.raw_data.bucket}/stock-data/year=%Y/month=%m/day=%d/hour=%H/"
+      daily   = "gcp://${gcs_bucket.raw_data.bucket}/stock-data/year=%Y/month=%m/day=%d/"
+      hourly  = "gcp://${gcs_bucket.raw_data.bucket}/stock-data/year=%Y/month=%m/day=%d/hour=%H/"
     }
     sector_data = {
-      daily   = "s3://${aws_s3_bucket.raw_data.bucket}/sector-data/year=%Y/month=%m/day=%d/"
-      weekly  = "s3://${aws_s3_bucket.raw_data.bucket}/sector-data/year=%Y/week=%W/"
+      daily   = "gcp://${gcs_bucket.raw_data.bucket}/sector-data/year=%Y/month=%m/day=%d/"
+      weekly  = "gcp://${gcs_bucket.raw_data.bucket}/sector-data/year=%Y/week=%W/"
     }
     macro_data = {
-      daily   = "s3://${aws_s3_bucket.raw_data.bucket}/macro-data/year=%Y/month=%m/day=%d/"
-      monthly = "s3://${aws_s3_bucket.raw_data.bucket}/macro-data/year=%Y/month=%m/"
+      daily   = "gcp://${gcs_bucket.raw_data.bucket}/macro-data/year=%Y/month=%m/day=%d/"
+      monthly = "gcp://${gcs_bucket.raw_data.bucket}/macro-data/year=%Y/month=%m/"
     }
   }
 }
@@ -283,10 +283,10 @@ output "lifecycle_policies" {
 output "integration_endpoints" {
   description = "Integration endpoints for other services"
   value = {
-    airflow_dags_bucket     = aws_s3_bucket.dags.bucket
-    redshift_copy_path      = "s3://${aws_s3_bucket.processed_data.bucket}/redshift-ready/"
-    analytics_output_path   = "s3://${aws_s3_bucket.processed_data.bucket}/analytics/"
-    data_quality_logs_path  = "s3://${aws_s3_bucket.logs.bucket}/data-quality/"
-    pipeline_logs_path      = "s3://${aws_s3_bucket.logs.bucket}/pipeline/"
+    airflow_dags_bucket     = gcs_bucket.dags.bucket
+    bigquery_copy_path      = "gcp://${gcs_bucket.processed_data.bucket}/bigquery-ready/"
+    analytics_output_path   = "gcp://${gcs_bucket.processed_data.bucket}/analytics/"
+    data_quality_logs_path  = "gcp://${gcs_bucket.logs.bucket}/data-quality/"
+    pipeline_logs_path      = "gcp://${gcs_bucket.logs.bucket}/pipeline/"
   }
 }

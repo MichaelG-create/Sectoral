@@ -1,12 +1,12 @@
 # =============================================================================
-# S3 MODULE - Financial Data Pipeline
+# GCS MODULE - Financial Data Pipeline
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# S3 Bucket for Raw Data
+# GCS Bucket for Raw Data
 # -----------------------------------------------------------------------------
 
-resource "aws_s3_bucket" "raw_data" {
+resource "gcs_bucket" "raw_data" {
   bucket = var.raw_bucket_name
 
   tags = merge(var.common_tags, {
@@ -15,15 +15,15 @@ resource "aws_s3_bucket" "raw_data" {
   })
 }
 
-resource "aws_s3_bucket_versioning" "raw_data_versioning" {
-  bucket = aws_s3_bucket.raw_data.id
+resource "gcs_bucket_versioning" "raw_data_versioning" {
+  bucket = gcs_bucket.raw_data.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "raw_data_encryption" {
-  bucket = aws_s3_bucket.raw_data.id
+resource "gcs_bucket_server_side_encryption_configuration" "raw_data_encryption" {
+  bucket = gcs_bucket.raw_data.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -33,8 +33,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "raw_data_encrypti
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "raw_data_pab" {
-  bucket = aws_s3_bucket.raw_data.id
+resource "gcs_bucket_public_access_block" "raw_data_pab" {
+  bucket = gcs_bucket.raw_data.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -42,8 +42,8 @@ resource "aws_s3_bucket_public_access_block" "raw_data_pab" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "raw_data_lifecycle" {
-  bucket = aws_s3_bucket.raw_data.id
+resource "gcs_bucket_lifecycle_configuration" "raw_data_lifecycle" {
+  bucket = gcs_bucket.raw_data.id
 
   rule {
     id     = "raw_data_lifecycle"
@@ -64,10 +64,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "raw_data_lifecycle" {
 }
 
 # -----------------------------------------------------------------------------
-# S3 Bucket for Processed Data
+# GCS Bucket for Processed Data
 # -----------------------------------------------------------------------------
 
-resource "aws_s3_bucket" "processed_data" {
+resource "gcs_bucket" "processed_data" {
   bucket = var.processed_bucket_name
 
   tags = merge(var.common_tags, {
@@ -76,15 +76,15 @@ resource "aws_s3_bucket" "processed_data" {
   })
 }
 
-resource "aws_s3_bucket_versioning" "processed_data_versioning" {
-  bucket = aws_s3_bucket.processed_data.id
+resource "gcs_bucket_versioning" "processed_data_versioning" {
+  bucket = gcs_bucket.processed_data.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "processed_data_encryption" {
-  bucket = aws_s3_bucket.processed_data.id
+resource "gcs_bucket_server_side_encryption_configuration" "processed_data_encryption" {
+  bucket = gcs_bucket.processed_data.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -94,8 +94,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "processed_data_en
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "processed_data_pab" {
-  bucket = aws_s3_bucket.processed_data.id
+resource "gcs_bucket_public_access_block" "processed_data_pab" {
+  bucket = gcs_bucket.processed_data.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -103,8 +103,8 @@ resource "aws_s3_bucket_public_access_block" "processed_data_pab" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "processed_data_lifecycle" {
-  bucket = aws_s3_bucket.processed_data.id
+resource "gcs_bucket_lifecycle_configuration" "processed_data_lifecycle" {
+  bucket = gcs_bucket.processed_data.id
 
   rule {
     id     = "processed_data_lifecycle"
@@ -140,10 +140,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "processed_data_lifecycle" {
 }
 
 # -----------------------------------------------------------------------------
-# S3 Bucket for Logs
+# GCS Bucket for Logs
 # -----------------------------------------------------------------------------
 
-resource "aws_s3_bucket" "logs" {
+resource "gcs_bucket" "logs" {
   bucket = var.logs_bucket_name
 
   tags = merge(var.common_tags, {
@@ -152,15 +152,15 @@ resource "aws_s3_bucket" "logs" {
   })
 }
 
-resource "aws_s3_bucket_versioning" "logs_versioning" {
-  bucket = aws_s3_bucket.logs.id
+resource "gcs_bucket_versioning" "logs_versioning" {
+  bucket = gcs_bucket.logs.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "logs_encryption" {
-  bucket = aws_s3_bucket.logs.id
+resource "gcs_bucket_server_side_encryption_configuration" "logs_encryption" {
+  bucket = gcs_bucket.logs.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -170,8 +170,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "logs_encryption" 
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "logs_pab" {
-  bucket = aws_s3_bucket.logs.id
+resource "gcs_bucket_public_access_block" "logs_pab" {
+  bucket = gcs_bucket.logs.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -179,8 +179,8 @@ resource "aws_s3_bucket_public_access_block" "logs_pab" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "logs_lifecycle" {
-  bucket = aws_s3_bucket.logs.id
+resource "gcs_bucket_lifecycle_configuration" "logs_lifecycle" {
+  bucket = gcs_bucket.logs.id
 
   rule {
     id     = "logs_lifecycle"
@@ -211,10 +211,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs_lifecycle" {
 }
 
 # -----------------------------------------------------------------------------
-# S3 Bucket for Airflow DAGs
+# GCS Bucket for Airflow DAGs
 # -----------------------------------------------------------------------------
 
-resource "aws_s3_bucket" "dags" {
+resource "gcs_bucket" "dags" {
   bucket = var.dags_bucket_name
 
   tags = merge(var.common_tags, {
@@ -223,15 +223,15 @@ resource "aws_s3_bucket" "dags" {
   })
 }
 
-resource "aws_s3_bucket_versioning" "dags_versioning" {
-  bucket = aws_s3_bucket.dags.id
+resource "gcs_bucket_versioning" "dags_versioning" {
+  bucket = gcs_bucket.dags.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "dags_encryption" {
-  bucket = aws_s3_bucket.dags.id
+resource "gcs_bucket_server_side_encryption_configuration" "dags_encryption" {
+  bucket = gcs_bucket.dags.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -241,8 +241,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "dags_encryption" 
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "dags_pab" {
-  bucket = aws_s3_bucket.dags.id
+resource "gcs_bucket_public_access_block" "dags_pab" {
+  bucket = gcs_bucket.dags.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -251,47 +251,47 @@ resource "aws_s3_bucket_public_access_block" "dags_pab" {
 }
 
 # -----------------------------------------------------------------------------
-# S3 Bucket Notifications
+# GCS Bucket Notifications
 # -----------------------------------------------------------------------------
 
-resource "aws_s3_bucket_notification" "raw_data_notification" {
-  bucket = aws_s3_bucket.raw_data.id
+resource "gcs_bucket_notification" "raw_data_notification" {
+  bucket = gcs_bucket.raw_data.id
 
-  lambda_function {
-    lambda_function_arn = var.data_processing_lambda_arn
-    events              = ["s3:ObjectCreated:*"]
+  cloudfunctions_function {
+    cloudfunctions_function_arn = var.data_processing_cloudfunctions_arn
+    events              = ["gcp:ObjectCreated:*"]
     filter_prefix       = "stock-data/"
     filter_suffix       = ".json"
   }
 
-  lambda_function {
-    lambda_function_arn = var.data_validation_lambda_arn
-    events              = ["s3:ObjectCreated:*"]
+  cloudfunctions_function {
+    cloudfunctions_function_arn = var.data_validation_cloudfunctions_arn
+    events              = ["gcp:ObjectCreated:*"]
     filter_prefix       = "sector-data/"
     filter_suffix       = ".json"
   }
 
-  depends_on = [aws_lambda_permission.allow_bucket_raw_data]
+  depends_on = [gcp_cloudfunctions_permission.allow_bucket_raw_data]
 }
 
 # -----------------------------------------------------------------------------
-# Lambda Permissions for S3 Notifications
+# Lambda Permissions for GCS Notifications
 # -----------------------------------------------------------------------------
 
-resource "aws_lambda_permission" "allow_bucket_raw_data" {
-  statement_id  = "AllowExecutionFromS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = var.data_processing_lambda_function_name
-  principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.raw_data.arn
+resource "gcp_cloudfunctions_permission" "allow_bucket_raw_data" {
+  statement_id  = "AllowExecutionFromGCSBucket"
+  action        = "cloudfunctions:InvokeFunction"
+  function_name = var.data_processing_cloudfunctions_function_name
+  principal     = "gcp.googlegcp.com"
+  source_arn    = gcs_bucket.raw_data.arn
 }
 
 # -----------------------------------------------------------------------------
-# S3 Bucket Policies
+# GCS Bucket Policies
 # -----------------------------------------------------------------------------
 
-resource "aws_s3_bucket_policy" "raw_data_policy" {
-  bucket = aws_s3_bucket.raw_data.id
+resource "gcs_bucket_policy" "raw_data_policy" {
+  bucket = gcs_bucket.raw_data.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -300,40 +300,40 @@ resource "aws_s3_bucket_policy" "raw_data_policy" {
         Sid    = "AllowAirflowAccess"
         Effect = "Allow"
         Principal = {
-          AWS = var.airflow_execution_role_arn
+          GCP = var.airflow_execution_role_arn
         }
         Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
+          "gcp:GetObject",
+          "gcp:PutObject",
+          "gcp:DeleteObject",
+          "gcp:ListBucket"
         ]
         Resource = [
-          aws_s3_bucket.raw_data.arn,
-          "${aws_s3_bucket.raw_data.arn}/*"
+          gcs_bucket.raw_data.arn,
+          "${gcs_bucket.raw_data.arn}/*"
         ]
       },
       {
-        Sid    = "AllowRedshiftAccess"
+        Sid    = "AllowBigQueryAccess"
         Effect = "Allow"
         Principal = {
-          AWS = var.redshift_service_role_arn
+          GCP = var.bigquery_service_role_arn
         }
         Action = [
-          "s3:GetObject",
-          "s3:ListBucket"
+          "gcp:GetObject",
+          "gcp:ListBucket"
         ]
         Resource = [
-          aws_s3_bucket.raw_data.arn,
-          "${aws_s3_bucket.raw_data.arn}/*"
+          gcs_bucket.raw_data.arn,
+          "${gcs_bucket.raw_data.arn}/*"
         ]
       }
     ]
   })
 }
 
-resource "aws_s3_bucket_policy" "processed_data_policy" {
-  bucket = aws_s3_bucket.processed_data.id
+resource "gcs_bucket_policy" "processed_data_policy" {
+  bucket = gcs_bucket.processed_data.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -342,32 +342,32 @@ resource "aws_s3_bucket_policy" "processed_data_policy" {
         Sid    = "AllowAirflowAccess"
         Effect = "Allow"
         Principal = {
-          AWS = var.airflow_execution_role_arn
+          GCP = var.airflow_execution_role_arn
         }
         Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
+          "gcp:GetObject",
+          "gcp:PutObject",
+          "gcp:DeleteObject",
+          "gcp:ListBucket"
         ]
         Resource = [
-          aws_s3_bucket.processed_data.arn,
-          "${aws_s3_bucket.processed_data.arn}/*"
+          gcs_bucket.processed_data.arn,
+          "${gcs_bucket.processed_data.arn}/*"
         ]
       },
       {
-        Sid    = "AllowRedshiftAccess"
+        Sid    = "AllowBigQueryAccess"
         Effect = "Allow"
         Principal = {
-          AWS = var.redshift_service_role_arn
+          GCP = var.bigquery_service_role_arn
         }
         Action = [
-          "s3:GetObject",
-          "s3:ListBucket"
+          "gcp:GetObject",
+          "gcp:ListBucket"
         ]
         Resource = [
-          aws_s3_bucket.processed_data.arn,
-          "${aws_s3_bucket.processed_data.arn}/*"
+          gcs_bucket.processed_data.arn,
+          "${gcs_bucket.processed_data.arn}/*"
         ]
       }
     ]
@@ -375,19 +375,19 @@ resource "aws_s3_bucket_policy" "processed_data_policy" {
 }
 
 # -----------------------------------------------------------------------------
-# CloudWatch Events for S3 Monitoring
+# CloudWatch Events for GCS Monitoring
 # -----------------------------------------------------------------------------
 
-resource "aws_cloudwatch_event_rule" "s3_data_arrival" {
-  name        = "${var.project_name}-s3-data-arrival-${var.environment}"
-  description = "Trigger when new data arrives in S3"
+resource "gcp_cloudwatch_event_rule" "gcs_data_arrival" {
+  name        = "${var.project_name}-gcp-data-arrival-${var.environment}"
+  description = "Trigger when new data arrives in GCS"
 
   event_pattern = jsonencode({
-    source      = ["aws.s3"]
+    source      = ["gcp.gcp"]
     detail-type = ["Object Created"]
     detail = {
       bucket = {
-        name = [aws_s3_bucket.raw_data.id]
+        name = [gcs_bucket.raw_data.id]
       }
     }
   })
@@ -395,18 +395,18 @@ resource "aws_cloudwatch_event_rule" "s3_data_arrival" {
   tags = var.common_tags
 }
 
-resource "aws_cloudwatch_event_target" "sns_target" {
-  rule      = aws_cloudwatch_event_rule.s3_data_arrival.name
+resource "gcp_cloudwatch_event_target" "sns_target" {
+  rule      = gcp_cloudwatch_event_rule.gcs_data_arrival.name
   target_id = "SendToSNS"
   arn       = var.sns_topic_arn
 }
 
 # -----------------------------------------------------------------------------
-# S3 Inventory Configuration
+# GCS Inventory Configuration
 # -----------------------------------------------------------------------------
 
-resource "aws_s3_bucket_inventory" "raw_data_inventory" {
-  bucket = aws_s3_bucket.raw_data.id
+resource "gcs_bucket_inventory" "raw_data_inventory" {
+  bucket = gcs_bucket.raw_data.id
   name   = "raw-data-inventory"
 
   included_object_versions = "Current"
@@ -418,7 +418,7 @@ resource "aws_s3_bucket_inventory" "raw_data_inventory" {
   destination {
     bucket {
       format     = "CSV"
-      bucket_arn = aws_s3_bucket.logs.arn
+      bucket_arn = gcs_bucket.logs.arn
       prefix     = "inventory/raw-data/"
     }
   }
@@ -435,11 +435,11 @@ resource "aws_s3_bucket_inventory" "raw_data_inventory" {
 }
 
 # -----------------------------------------------------------------------------
-# S3 Metrics Configuration
+# GCS Metrics Configuration
 # -----------------------------------------------------------------------------
 
-resource "aws_s3_bucket_metric" "raw_data_metrics" {
-  bucket = aws_s3_bucket.raw_data.id
+resource "gcs_bucket_metric" "raw_data_metrics" {
+  bucket = gcs_bucket.raw_data.id
   name   = "raw-data-metrics"
 
   filter {
@@ -450,8 +450,8 @@ resource "aws_s3_bucket_metric" "raw_data_metrics" {
   }
 }
 
-resource "aws_s3_bucket_metric" "processed_data_metrics" {
-  bucket = aws_s3_bucket.processed_data.id
+resource "gcs_bucket_metric" "processed_data_metrics" {
+  bucket = gcs_bucket.processed_data.id
   name   = "processed-data-metrics"
 
   filter {

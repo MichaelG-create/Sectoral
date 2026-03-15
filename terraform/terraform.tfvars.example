@@ -9,63 +9,63 @@
 
 project_name = "financial-data-pipeline"
 environment  = "dev"
-aws_region   = "us-east-1"
+gcp_region   = "us-east-1"
 
 # -----------------------------------------------------------------------------
-# S3 Configuration
+# GCS Configuration
 # -----------------------------------------------------------------------------
 
-# S3 bucket names must be globally unique - update these with your prefix
-s3_raw_bucket_name       = "your-org-financial-raw-data-dev"
-s3_processed_bucket_name = "your-org-financial-processed-data-dev"
-s3_logs_bucket_name      = "your-org-financial-logs-dev"
-s3_dags_bucket_name      = "your-org-financial-dags-dev"
+# GCS bucket names must be globally unique - update these with your prefix
+gcs_raw_bucket_name       = "your-org-financial-raw-data-dev"
+gcs_processed_bucket_name = "your-org-financial-processed-data-dev"
+gcs_logs_bucket_name      = "your-org-financial-logs-dev"
+gcs_dags_bucket_name      = "your-org-financial-dags-dev"
 
-# S3 lifecycle configuration
-s3_raw_data_expiration_days       = 365
-s3_processed_data_expiration_days = 1095
-s3_logs_expiration_days           = 90
+# GCS lifecycle configuration
+gcs_raw_data_expiration_days       = 365
+gcs_processed_data_expiration_days = 1095
+gcs_logs_expiration_days           = 90
 
 # -----------------------------------------------------------------------------
-# Redshift Configuration
+# BigQuery Configuration
 # -----------------------------------------------------------------------------
 
-redshift_cluster_identifier = "financial-data-cluster-dev"
-redshift_database_name      = "financial_data"
-redshift_master_username    = "admin"
-redshift_master_password    = "YourSecurePassword123!"  # Change this!
-redshift_node_type          = "dc2.large"
-redshift_number_of_nodes    = 1
-redshift_port               = 5439
-redshift_skip_final_snapshot = true
+bigquery_cluster_identifier = "financial-data-cluster-dev"
+bigquery_database_name      = "financial_data"
+bigquery_master_username    = "admin"
+bigquery_master_password    = "YourSecurePassword123!"  # Change this!
+bigquery_node_type          = "dc2.large"
+bigquery_number_of_nodes    = 1
+bigquery_port               = 5439
+bigquery_skip_final_snapshot = true
 
 # Enable enhanced VPC routing for better security
-redshift_enhanced_vpc_routing = true
+bigquery_enhanced_vpc_routing = true
 
 # -----------------------------------------------------------------------------
-# MWAA (Airflow) Configuration
+# Cloud Composer (Airflow) Configuration
 # -----------------------------------------------------------------------------
 
-mwaa_environment_name = "financial-data-airflow-dev"
-mwaa_airflow_version  = "2.5.1"
+cloudcomposer_environment_name = "financial-data-airflow-dev"
+cloudcomposer_airflow_version  = "2.5.1"
 
 # Environment class determines compute resources
 # Options: mw1.small, mw1.medium, mw1.large
-mwaa_environment_class = "mw1.small"
+cloudcomposer_environment_class = "mw1.small"
 
 # Worker configuration
-mwaa_max_workers = 10
-mwaa_min_workers = 1
+cloudcomposer_max_workers = 10
+cloudcomposer_min_workers = 1
 
 # Scheduler configuration
-mwaa_schedulers = 1
+cloudcomposer_schedulers = 1
 
 # Enable webserver and scheduler logs
-mwaa_webserver_log_level = "INFO"
-mwaa_scheduler_log_level = "INFO"
-mwaa_dag_log_level      = "INFO"
-mwaa_worker_log_level   = "INFO"
-mwaa_task_log_level     = "INFO"
+cloudcomposer_webserver_log_level = "INFO"
+cloudcomposer_scheduler_log_level = "INFO"
+cloudcomposer_dag_log_level      = "INFO"
+cloudcomposer_worker_log_level   = "INFO"
+cloudcomposer_task_log_level     = "INFO"
 
 # -----------------------------------------------------------------------------
 # VPC Configuration
@@ -86,8 +86,8 @@ availability_zones = ["us-east-1a", "us-east-1b"]
 # Security Configuration
 # -----------------------------------------------------------------------------
 
-# CIDR blocks that can access Redshift
-redshift_allowed_cidr_blocks = ["10.0.0.0/16"]
+# CIDR blocks that can access BigQuery
+bigquery_allowed_cidr_blocks = ["10.0.0.0/16"]
 
 # Enable deletion protection for production
 enable_deletion_protection = false
@@ -143,8 +143,8 @@ common_tags = {
 # Backup Configuration
 # -----------------------------------------------------------------------------
 
-# Redshift backup retention period
-redshift_backup_retention_period = 7
+# BigQuery backup retention period
+bigquery_backup_retention_period = 7
 
 # Enable automated backups
 enable_automated_backups = true
@@ -159,8 +159,8 @@ maintenance_window = "sun:04:00-sun:05:00"
 # Performance Configuration
 # -----------------------------------------------------------------------------
 
-# Redshift query timeout (in seconds)
-redshift_query_timeout = 300
+# BigQuery query timeout (in seconds)
+bigquery_query_timeout = 300
 
 # Enable query result caching
 enable_query_result_caching = true
@@ -195,9 +195,9 @@ fred_secret_name         = "financial-pipeline/fred-api-key"
 # -----------------------------------------------------------------------------
 
 # Lambda function configurations
-lambda_timeout = 300
-lambda_memory_size = 512
-lambda_runtime = "python3.9"
+cloudfunctions_timeout = 300
+cloudfunctions_memory_size = 512
+cloudfunctions_runtime = "python3.9"
 
 # -----------------------------------------------------------------------------
 # Data Quality Configuration

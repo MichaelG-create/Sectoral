@@ -1,33 +1,33 @@
 #=============================================================================
-# MWAA (Managed Airflow) MODULE - Financial Data Pipeline
+# Cloud Composer (Managed Airflow) MODULE - Financial Data Pipeline
 #=============================================================================
 #
-# Amazon Managed Workflows for Apache Airflow (MWAA) configuration
+# Google Managed Workflows for Apache Airflow (Cloud Composer) configuration
 #
 #------------------------------------------------------------------------------
 
-# S3 bucket for Airflow source code
-resource "aws_s3_bucket" "mwaa_source" {
-  bucket = "${var.project_name}-${var.environment}-mwaa-source"
+# GCS bucket for Airflow source code
+resource "gcs_bucket" "cloudcomposer_source" {
+  bucket = "${var.project_name}-${var.environment}-cloudcomposer-source"
 
   tags = merge(var.tags, {
-    Name        = "${var.project_name}-${var.environment}-mwaa-source"
+    Name        = "${var.project_name}-${var.environment}-cloudcomposer-source"
     Environment = var.environment
-    Component   = "mwaa"
+    Component   = "cloudcomposer"
   })
 }
 
-# S3 bucket versioning
-resource "aws_s3_bucket_versioning" "mwaa_source" {
-  bucket = aws_s3_bucket.mwaa_source.id
+# GCS bucket versioning
+resource "gcs_bucket_versioning" "cloudcomposer_source" {
+  bucket = gcs_bucket.cloudcomposer_source.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-# S3 bucket public access block
-resource "aws_s3_bucket_public_access_block" "mwaa_source" {
-  bucket = aws_s3_bucket.mwaa_source.id
+# GCS bucket public access block
+resource "gcs_bucket_public_access_block" "cloudcomposer_source" {
+  bucket = gcs_bucket.cloudcomposer_source.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -35,13 +35,13 @@ resource "aws_s3_bucket_public_access_block" "mwaa_source" {
   restrict_public_buckets = true
 }
 
-# S3 bucket server-side encryption
-resource "aws_s3_bucket_server_side_encryption_configuration" "mwaa_source" {
-  bucket = aws_s3_bucket.mwaa_source.id
+# GCS bucket server-side encryption
+resource "gcs_bucket_server_side_encryption_configuration" "cloudcomposer_source" {
+  bucket = gcs_bucket.cloudcomposer_source.id
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm     = var.kms_key_id != null ? "aws:kms" : "AES256"
+      sse_algorithm     = var.kms_key_id != null ? "gcp:kms" : "AES256"
       kms_master_key_id = var.kms_key_id
     }
     bucket_key_enabled = true
@@ -49,42 +49,42 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "mwaa_source" {
 }
 
 # Upload requirements.txt for Airflow
-resource "aws_s3_object" "requirements" {
-  bucket = aws_s3_bucket.mwaa_source.id
+resource "gcs_object" "requirements" {
+  bucket = gcs_bucket.cloudcomposer_source.id
   key    = "requirements.txt"
   source = var.requirements_file_path
   etag   = filemd5(var.requirements_file_path)
 
-  depends_on = [aws_s3_bucket_versioning.mwaa_source]
+  depends_on = [gcs_bucket_versioning.cloudcomposer_source]
 }
 
-# Upload DAGs to S3
-resource "aws_s3_object" "dags" {
+# Upload DAGs to GCS
+resource "gcs_object" "dags" {
   for_each = var.dags_folder_path != null ? fileset(var.dags_folder_path, "**/*.py") : []
 
-  bucket = aws_s3_bucket.mwaa_source.id
+  bucket = gcs_bucket.cloudcomposer_source.id
   key    = "dags/${each.value}"
   source = "${var.dags_folder_path}/${each.value}"
   etag   = filemd5("${var.dags_folder_path}/${each.value}")
 
-  depends_on = [aws_s3_bucket_versioning.mwaa_source]
+  depends_on = [gcs_bucket_versioning.cloudcomposer_source]
 }
 
-# Upload plugins to S3
-resource "aws_s3_object" "plugins" {
+# Upload plugins to GCS
+resource "gcs_object" "plugins" {
   for_each = var.plugins_folder_path != null ? fileset(var.plugins_folder_path, "**/*.py") : []
 
-  bucket = aws_s3_bucket.mwaa_source.id
+  bucket = gcs_bucket.cloudcomposer_source.id
   key    = "plugins/${each.value}"
   source = "${var.plugins_folder_path}/${each.value}"
   etag   = filemd5("${var.plugins_folder_path}/${each.value}")
 
-  depends_on = [aws_s3_bucket_versioning.mwaa_source]
+  depends_on = [gcs_bucket_versioning.cloudcomposer_source]
 }
 
-# IAM role for MWAA
-resource "aws_iam_role" "mwaa_execution_role" {
-  name = "${var.project_name}-${var.environment}-mwaa-execution-role"
+# IAM role for Cloud Composer
+resource "gcp_iam_role" "cloudcomposer_execution_role" {
+  name = "${var.project_name}-${var.environment}-cloudcomposer-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -94,8 +94,8 @@ resource "aws_iam_role" "mwaa_execution_role" {
         Effect = "Allow"
         Principal = {
           Service = [
-            "airflow-env.amazonaws.com",
-            "airflow.amazonaws.com"
+            "airflow-env.googlegcp.com",
+            "airflow.googlegcp.com"
           ]
         }
       }
@@ -103,16 +103,16 @@ resource "aws_iam_role" "mwaa_execution_role" {
   })
 
   tags = merge(var.tags, {
-    Name        = "${var.project_name}-${var.environment}-mwaa-execution-role"
+    Name        = "${var.project_name}-${var.environment}-cloudcomposer-execution-role"
     Environment = var.environment
-    Component   = "mwaa"
+    Component   = "cloudcomposer"
   })
 }
 
-# IAM policy for MWAA execution role
-resource "aws_iam_role_policy" "mwaa_execution_policy" {
-  name = "${var.project_name}-${var.environment}-mwaa-execution-policy"
-  role = aws_iam_role.mwaa_execution_role.id
+# IAM policy for Cloud Composer execution role
+resource "gcp_iam_role_policy" "cloudcomposer_execution_policy" {
+  name = "${var.project_name}-${var.environment}-cloudcomposer-execution-policy"
+  role = gcp_iam_role.cloudcomposer_execution_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -127,30 +127,30 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
       {
         Effect = "Allow"
         Action = [
-          "s3:ListAllMyBuckets"
+          "gcp:ListAllMyBuckets"
         ]
         Resource = "*"
       },
       {
         Effect = "Allow"
         Action = [
-          "s3:GetObject*",
-          "s3:GetBucket*",
-          "s3:List*"
+          "gcp:GetObject*",
+          "gcp:GetBucket*",
+          "gcp:List*"
         ]
         Resource = [
-          aws_s3_bucket.mwaa_source.arn,
-          "${aws_s3_bucket.mwaa_source.arn}/*"
+          gcs_bucket.cloudcomposer_source.arn,
+          "${gcs_bucket.cloudcomposer_source.arn}/*"
         ]
       },
       {
         Effect = "Allow"
         Action = [
-          "s3:GetObject*",
-          "s3:PutObject*",
-          "s3:DeleteObject*",
-          "s3:GetBucket*",
-          "s3:List*"
+          "gcp:GetObject*",
+          "gcp:PutObject*",
+          "gcp:DeleteObject*",
+          "gcp:GetBucket*",
+          "gcp:List*"
         ]
         Resource = var.data_bucket_arns
       },
@@ -166,7 +166,7 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
           "logs:GetQueryResults",
           "logs:DescribeLogGroups"
         ]
-        Resource = "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:airflow-${var.environment_name}-*"
+        Resource = "arn:gcp:logs:${var.gcp_region}:${var.gcp_account_id}:log-group:airflow-${var.environment_name}-*"
       },
       {
         Effect = "Allow"
@@ -192,24 +192,24 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
           "sqs:ReceiveMessage",
           "sqs:SendMessage"
         ]
-        Resource = "arn:aws:sqs:${var.aws_region}:*:airflow-celery-*"
+        Resource = "arn:gcp:sqs:${var.gcp_region}:*:airflow-celery-*"
       },
       {
         Effect = "Allow"
         Action = [
-          "redshift:GetClusterCredentials",
-          "redshift:DescribeClusters"
+          "bigquery:GetClusterCredentials",
+          "bigquery:DescribeClusters"
         ]
-        Resource = var.redshift_cluster_arn
+        Resource = var.bigquery_cluster_arn
       },
       {
         Effect = "Allow"
         Action = [
-          "redshift-data:BatchExecuteStatement",
-          "redshift-data:ExecuteStatement",
-          "redshift-data:GetStatementResult",
-          "redshift-data:DescribeStatement",
-          "redshift-data:ListStatements"
+          "bigquery-data:BatchExecuteStatement",
+          "bigquery-data:ExecuteStatement",
+          "bigquery-data:GetStatementResult",
+          "bigquery-data:DescribeStatement",
+          "bigquery-data:ListStatements"
         ]
         Resource = "*"
       }
@@ -217,10 +217,10 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
   })
 }
 
-# Security group for MWAA
-resource "aws_security_group" "mwaa" {
-  name        = "${var.project_name}-${var.environment}-mwaa-sg"
-  description = "Security group for MWAA environment"
+# Security group for Cloud Composer
+resource "gcp_security_group" "cloudcomposer" {
+  name        = "${var.project_name}-${var.environment}-cloudcomposer-sg"
+  description = "Security group for Cloud Composer environment"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -238,30 +238,30 @@ resource "aws_security_group" "mwaa" {
   }
 
   tags = merge(var.tags, {
-    Name        = "${var.project_name}-${var.environment}-mwaa-sg"
+    Name        = "${var.project_name}-${var.environment}-cloudcomposer-sg"
     Environment = var.environment
-    Component   = "mwaa"
+    Component   = "cloudcomposer"
   })
 }
 
-# MWAA Environment
-resource "aws_mwaa_environment" "main" {
+# Cloud Composer Environment
+resource "gcp_cloudcomposer_environment" "main" {
   name                    = "${var.project_name}-${var.environment}"
   airflow_version         = var.airflow_version
   environment_class       = var.environment_class
   max_workers             = var.max_workers
   min_workers             = var.min_workers
-  source_bucket_arn       = aws_s3_bucket.mwaa_source.arn
-  dag_s3_path             = "dags"
-  plugins_s3_path         = var.plugins_folder_path != null ? "plugins" : null
-  requirements_s3_path    = "requirements.txt"
-  execution_role_arn      = aws_iam_role.mwaa_execution_role.arn
+  source_bucket_arn       = gcs_bucket.cloudcomposer_source.arn
+  dag_gcs_path             = "dags"
+  plugins_gcs_path         = var.plugins_folder_path != null ? "plugins" : null
+  requirements_gcs_path    = "requirements.txt"
+  execution_role_arn      = gcp_iam_role.cloudcomposer_execution_role.arn
   kms_key                 = var.kms_key_id
   webserver_access_mode   = var.webserver_access_mode
   weekly_maintenance_window_start = var.weekly_maintenance_window_start
 
   network_configuration {
-    security_group_ids = [aws_security_group.mwaa.id]
+    security_group_ids = [gcp_security_group.cloudcomposer.id]
     subnet_ids         = var.subnet_ids
   }
 
@@ -295,15 +295,15 @@ resource "aws_mwaa_environment" "main" {
   airflow_configuration_options = var.airflow_configuration_options
 
   tags = merge(var.tags, {
-    Name        = "${var.project_name}-${var.environment}-mwaa"
+    Name        = "${var.project_name}-${var.environment}-cloudcomposer"
     Environment = var.environment
-    Component   = "mwaa"
+    Component   = "cloudcomposer"
   })
 
   depends_on = [
-    aws_s3_object.requirements,
-    aws_s3_object.dags,
-    aws_s3_object.plugins,
-    aws_iam_role_policy.mwaa_execution_policy
+    gcs_object.requirements,
+    gcs_object.dags,
+    gcs_object.plugins,
+    gcp_iam_role_policy.cloudcomposer_execution_policy
   ]
 }

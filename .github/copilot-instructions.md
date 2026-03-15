@@ -1,6 +1,6 @@
 **Project Overview**
 
-This repo implements an AWS-centric data pipeline for sectoral financial analysis. Main components are Airflow (orchestration), dbt (transformations), Terraform (infra), and Python services under `src/sectoral` that perform ingestion, transforms and exports.
+This repo implements an GCP-centric data pipeline for sectoral financial analysis. Main components are Airflow (orchestration), dbt (transformations), Terraform (infra), and Python services under `src/sectoral` that perform ingestion, transforms and exports.
 
 **Quick Orientation**
 - **Orchestration**: Airflow DAGs live in [airflow/dags](airflow/dags) (see `daily_market_ingestion.py`).
@@ -11,7 +11,7 @@ This repo implements an AWS-centric data pipeline for sectoral financial analysi
 
 **What to change and why**
 - Prefer editing `src/sectoral` code for operator logic (Airflow imports reference `sectoral.operators`). Do not assume `airflow/plugins` is the primary source for production operators.
-- DAG definitions in [airflow/dags/daily_market_ingestion.py](airflow/dags/daily_market_ingestion.py) import `SectoralIngestionOperator` and `SectoralTransformOperator` from the `sectoral` package — keep template_fields and file paths stable (`/opt/airflow/local_s3`, `config/sectoral.yaml`).
+- DAG definitions in [airflow/dags/daily_market_ingestion.py](airflow/dags/daily_market_ingestion.py) import `SectoralIngestionOperator` and `SectoralTransformOperator` from the `sectoral` package — keep template_fields and file paths stable (`/opt/airflow/local_gcs`, `config/sectoral.yaml`).
 
 **Developer Workflows (concrete commands)**
 - Create virtualenv and install deps: `make setup-env` (or `python -m venv venv && pip install -r requirements.txt`). See [Makefile](Makefile).
@@ -22,13 +22,13 @@ This repo implements an AWS-centric data pipeline for sectoral financial analysi
 
 **Project-specific conventions**
 - Python package entrypoint is `src/sectoral` and CLI script `sectoral_poc.py` uses `sectoral.cli:main` (see `pyproject.toml` scripts).
-- I/O paths in Airflow tasks use `/opt/airflow/local_s3` for development (bind-mounted to `./local_s3` in `docker-compose.yml`). Keep that path when writing or testing DAGs/operators.
+- I/O paths in Airflow tasks use `/opt/airflow/local_gcs` for development (bind-mounted to `./local_gcs` in `docker-compose.yml`). Keep that path when writing or testing DAGs/operators.
 - Configs are YAML under `config/` (`config/sectoral.yaml`) and are loaded via `SectoralConfig.from_yaml` (see `src/sectoral/config.py`).
 - Operators return plain dicts (they rely on Airflow XCom push-by-return). Prefer serializable primitives in returns.
 
 **Integration points & external dependencies**
 - External APIs: Alpha Vantage, Yahoo Finance, FRED (dependencies listed in `pyproject.toml`). Credentials live in environment variables / `.env` (see README).
-- AWS: S3 buckets and MWAA/Redshift. Deployment expects Terraform-managed resources under `terraform/`.
+- GCP: GCS buckets and Cloud Composer/BigQuery. Deployment expects Terraform-managed resources under `terraform/`.
 - Airflow in CI: workflows are under `.github/workflows` — use `make airflow-test` and `airflow dags test` for DAG unit checks.
 
 **Examples & Patterns to Follow**
@@ -37,12 +37,12 @@ This repo implements an AWS-centric data pipeline for sectoral financial analysi
 - Tests: unit tests live in `tests/unit` and mirror operator behaviors — inspect `tests/test_operators.py` for examples of expected operator behavior.
 
 **What NOT to do**
-- Don’t hardcode production AWS identifiers in code. Use `terraform` outputs or Airflow Variables for environment-specific values.
-- Don’t change DAG IDs or template field names without updating tests and MWAA deployment sync.
+- Don’t hardcode production GCP identifiers in code. Use `terraform` outputs or Airflow Variables for environment-specific values.
+- Don’t change DAG IDs or template field names without updating tests and Cloud Composer deployment sync.
 
 **Where to look first when debugging**
-- Airflow logs: `airflow/logs/` (local) or CloudWatch (prod). Use `Makefile` target `view-logs` for AWS logs.
-- Local storage: `local_s3/` holds raw CSVs when running locally via docker-compose.
+- Airflow logs: `airflow/logs/` (local) or CloudWatch (prod). Use `Makefile` target `view-logs` for GCP logs.
+- Local storage: `local_gcs/` holds raw CSVs when running locally via docker-compose.
 - DBT failures: check `dbt/target` logs and `dbt` run output.
 
-If anything here is unclear or you want more depth (examples for editing DAGs, writing new operators, or a checklist for MWAA deployment), tell me which area to expand.
+If anything here is unclear or you want more depth (examples for editing DAGs, writing new operators, or a checklist for Cloud Composer deployment), tell me which area to expand.

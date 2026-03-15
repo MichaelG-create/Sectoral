@@ -2,8 +2,8 @@
 # General Variables
 # ===============================
 
-variable "aws_region" {
-  description = "AWS region for resources"
+variable "gcp_region" {
+  description = "GCP region for resources"
   type        = string
   default     = "us-east-1"
 }
@@ -24,119 +24,119 @@ variable "owner" {
 }
 
 # ===============================
-# S3 Variables
+# GCS Variables
 # ===============================
 
 variable "raw_data_lifecycle_days" {
-  description = "Number of days to keep raw data in S3"
+  description = "Number of days to keep raw data in GCS"
   type        = number
   default     = 90
 }
 
 variable "processed_data_lifecycle_days" {
-  description = "Number of days to keep processed data in S3"
+  description = "Number of days to keep processed data in GCS"
   type        = number
   default     = 365
 }
 
 variable "logs_lifecycle_days" {
-  description = "Number of days to keep logs in S3"
+  description = "Number of days to keep logs in GCS"
   type        = number
   default     = 30
 }
 
 # ===============================
-# Redshift Variables
+# BigQuery Variables
 # ===============================
 
-variable "redshift_cluster_identifier" {
-  description = "Redshift cluster identifier"
+variable "bigquery_cluster_identifier" {
+  description = "BigQuery cluster identifier"
   type        = string
   default     = "financial-data-cluster"
 }
 
-variable "redshift_node_type" {
-  description = "Redshift node type"
+variable "bigquery_node_type" {
+  description = "BigQuery node type"
   type        = string
   default     = "dc2.large"
 }
 
-variable "redshift_number_of_nodes" {
-  description = "Number of nodes in Redshift cluster"
+variable "bigquery_number_of_nodes" {
+  description = "Number of nodes in BigQuery cluster"
   type        = number
   default     = 2
 }
 
-variable "redshift_database_name" {
-  description = "Name of the Redshift database"
+variable "bigquery_database_name" {
+  description = "Name of the BigQuery database"
   type        = string
   default     = "financial_data"
 }
 
-variable "redshift_master_username" {
-  description = "Master username for Redshift cluster"
+variable "bigquery_master_username" {
+  description = "Master username for BigQuery cluster"
   type        = string
   default     = "admin"
 }
 
-variable "redshift_master_password" {
-  description = "Master password for Redshift cluster"
+variable "bigquery_master_password" {
+  description = "Master password for BigQuery cluster"
   type        = string
   sensitive   = true
 }
 
-variable "redshift_vpc_security_group_ids" {
-  description = "List of VPC security group IDs for Redshift"
+variable "bigquery_vpc_security_group_ids" {
+  description = "List of VPC security group IDs for BigQuery"
   type        = list(string)
   default     = []
 }
 
-variable "redshift_subnet_group_name" {
-  description = "Name of the subnet group for Redshift"
+variable "bigquery_subnet_group_name" {
+  description = "Name of the subnet group for BigQuery"
   type        = string
   default     = null
 }
 
 # ===============================
-# MWAA Variables
+# Cloud Composer Variables
 # ===============================
 
-variable "mwaa_airflow_version" {
-  description = "Airflow version for MWAA"
+variable "cloudcomposer_airflow_version" {
+  description = "Airflow version for Cloud Composer"
   type        = string
   default     = "2.7.2"
 }
 
-variable "mwaa_environment_class" {
-  description = "Environment class for MWAA"
+variable "cloudcomposer_environment_class" {
+  description = "Environment class for Cloud Composer"
   type        = string
   default     = "mw1.small"
   validation {
-    condition     = contains(["mw1.small", "mw1.medium", "mw1.large"], var.mwaa_environment_class)
+    condition     = contains(["mw1.small", "mw1.medium", "mw1.large"], var.cloudcomposer_environment_class)
     error_message = "Environment class must be one of: mw1.small, mw1.medium, mw1.large."
   }
 }
 
-variable "mwaa_dag_s3_path" {
-  description = "S3 path for DAGs in MWAA"
+variable "cloudcomposer_dag_gcs_path" {
+  description = "GCS path for DAGs in Cloud Composer"
   type        = string
   default     = "dags"
 }
 
-variable "mwaa_subnet_ids" {
-  description = "List of subnet IDs for MWAA"
+variable "cloudcomposer_subnet_ids" {
+  description = "List of subnet IDs for Cloud Composer"
   type        = list(string)
   default     = []
 }
 
-variable "mwaa_security_group_ids" {
-  description = "List of security group IDs for MWAA"
+variable "cloudcomposer_security_group_ids" {
+  description = "List of security group IDs for Cloud Composer"
   type        = list(string)
   default     = []
 }
 
-variable "mwaa_airflow_configuration_options" {
-  description = "Airflow configuration options for MWAA"
+variable "cloudcomposer_airflow_configuration_options" {
+  description = "Airflow configuration options for Cloud Composer"
   type        = map(string)
   default = {
     "core.dags_are_paused_at_creation"          = "True"
@@ -148,8 +148,8 @@ variable "mwaa_airflow_configuration_options" {
     "celery.worker_concurrency"                 = "2"
     "logging.logging_level"                     = "INFO"
     "logging.remote_logging"                    = "True"
-    "logging.remote_base_log_folder"           = "s3://BUCKET_NAME/logs"
-    "logging.remote_log_conn_id"               = "aws_default"
+    "logging.remote_base_log_folder"           = "gcp://BUCKET_NAME/logs"
+    "logging.remote_log_conn_id"               = "gcp_default"
   }
 }
 
@@ -201,8 +201,8 @@ variable "enable_cost_optimization" {
   default     = true
 }
 
-variable "redshift_pause_cluster" {
-  description = "Pause Redshift cluster when not in use (dev/staging only)"
+variable "bigquery_pause_cluster" {
+  description = "Pause BigQuery cluster when not in use (dev/staging only)"
   type        = bool
   default     = false
 }

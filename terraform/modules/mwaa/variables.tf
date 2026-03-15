@@ -1,8 +1,8 @@
 #=============================================================================
-# MWAA MODULE VARIABLES - Financial Data Pipeline
+# Cloud Composer MODULE VARIABLES - Financial Data Pipeline
 #=============================================================================
 #
-# Variables for MWAA (Managed Airflow) configuration
+# Variables for Cloud Composer (Managed Airflow) configuration
 #
 #------------------------------------------------------------------------------
 
@@ -17,28 +17,28 @@ variable "environment" {
 }
 
 variable "environment_name" {
-  description = "MWAA environment name"
+  description = "Cloud Composer environment name"
   type        = string
   default     = null
 }
 
-variable "aws_region" {
-  description = "AWS region"
+variable "gcp_region" {
+  description = "GCP region"
   type        = string
 }
 
-variable "aws_account_id" {
-  description = "AWS account ID"
+variable "gcp_account_id" {
+  description = "GCP account ID"
   type        = string
 }
 
 variable "vpc_id" {
-  description = "VPC ID where MWAA will be deployed"
+  description = "VPC ID where Cloud Composer will be deployed"
   type        = string
 }
 
 variable "subnet_ids" {
-  description = "List of subnet IDs for MWAA"
+  description = "List of subnet IDs for Cloud Composer"
   type        = list(string)
 }
 
@@ -50,19 +50,19 @@ variable "airflow_version" {
     condition = contains([
       "2.8.1", "2.7.2", "2.6.3", "2.5.1", "2.4.3"
     ], var.airflow_version)
-    error_message = "Airflow version must be supported by MWAA."
+    error_message = "Airflow version must be supported by Cloud Composer."
   }
 }
 
 variable "environment_class" {
-  description = "Environment class for MWAA"
+  description = "Environment class for Cloud Composer"
   type        = string
   default     = "mw1.small"
   validation {
     condition = contains([
       "mw1.small", "mw1.medium", "mw1.large", "mw1.xlarge", "mw1.2xlarge"
     ], var.environment_class)
-    error_message = "Environment class must be a valid MWAA environment class."
+    error_message = "Environment class must be a valid Cloud Composer environment class."
   }
 }
 
@@ -127,13 +127,13 @@ variable "plugins_folder_path" {
 }
 
 variable "data_bucket_arns" {
-  description = "List of S3 bucket ARNs for data access"
+  description = "List of GCS bucket ARNs for data access"
   type        = list(string)
   default     = []
 }
 
-variable "redshift_cluster_arn" {
-  description = "ARN of the Redshift cluster"
+variable "bigquery_cluster_arn" {
+  description = "ARN of the BigQuery cluster"
   type        = string
   default     = "*"
 }

@@ -1,0 +1,12 @@
+sectoral:
+  outputs:
+    dev_bigquery:
+      type: bigquery
+      method: service-account
+      project: sectoral-490115            # Défini dans GCP
+      dataset: sectoral_dev               # créé en CLI BigQuery (possible aussi via Terraform)
+      threads: 4
+      keyfile: /home/michael/.keys/dbt-bigquery-sectoral.json  # chemin local vers le JSON du service account GCP dédié à dbt
+      location: EU                         # ou europe-west1, etc.
+      priority: interactive
+  target: dev_bigquery

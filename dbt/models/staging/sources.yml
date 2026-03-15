@@ -2,8 +2,8 @@ version: 2
 
 sources:
   - name: sectoral_raw
-    database: airflow
-    schema: public
+    database: sectoral-490115      # ← project id GCP
+    schema: sectoral_raw           # ← dataset où mettre les tables brutes
     tables:
       - name: raw_stock_prices
         columns:

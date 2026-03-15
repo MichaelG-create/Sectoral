@@ -1,5 +1,5 @@
 # =============================================================================
-# S3 MODULE VARIABLES - Financial Data Pipeline
+# GCS MODULE VARIABLES - Financial Data Pipeline
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -23,26 +23,26 @@ variable "common_tags" {
 }
 
 # -----------------------------------------------------------------------------
-# S3 Bucket Names
+# GCS Bucket Names
 # -----------------------------------------------------------------------------
 
 variable "raw_bucket_name" {
-  description = "Name of the S3 bucket for raw data"
+  description = "Name of the GCS bucket for raw data"
   type        = string
 }
 
 variable "processed_bucket_name" {
-  description = "Name of the S3 bucket for processed data"
+  description = "Name of the GCS bucket for processed data"
   type        = string
 }
 
 variable "logs_bucket_name" {
-  description = "Name of the S3 bucket for logs"
+  description = "Name of the GCS bucket for logs"
   type        = string
 }
 
 variable "dags_bucket_name" {
-  description = "Name of the S3 bucket for Airflow DAGs"
+  description = "Name of the GCS bucket for Airflow DAGs"
   type        = string
 }
 
@@ -72,19 +72,19 @@ variable "logs_expiration_days" {
 # Lambda Function Integration
 # -----------------------------------------------------------------------------
 
-variable "data_processing_lambda_arn" {
+variable "data_processing_cloudfunctions_arn" {
   description = "ARN of the Lambda function for data processing"
   type        = string
   default     = ""
 }
 
-variable "data_validation_lambda_arn" {
+variable "data_validation_cloudfunctions_arn" {
   description = "ARN of the Lambda function for data validation"
   type        = string
   default     = ""
 }
 
-variable "data_processing_lambda_function_name" {
+variable "data_processing_cloudfunctions_function_name" {
   description = "Name of the Lambda function for data processing"
   type        = string
   default     = ""
@@ -99,8 +99,8 @@ variable "airflow_execution_role_arn" {
   type        = string
 }
 
-variable "redshift_service_role_arn" {
-  description = "ARN of the Redshift service role"
+variable "bigquery_service_role_arn" {
+  description = "ARN of the BigQuery service role"
   type        = string
 }
 
@@ -118,13 +118,13 @@ variable "sns_topic_arn" {
 # -----------------------------------------------------------------------------
 
 variable "kms_key_id" {
-  description = "KMS key ID for S3 encryption"
+  description = "KMS key ID for GCS encryption"
   type        = string
   default     = ""
 }
 
 variable "enable_kms_encryption" {
-  description = "Enable KMS encryption for S3 buckets"
+  description = "Enable KMS encryption for GCS buckets"
   type        = bool
   default     = false
 }
@@ -134,7 +134,7 @@ variable "enable_kms_encryption" {
 # -----------------------------------------------------------------------------
 
 variable "allowed_cidr_blocks" {
-  description = "List of CIDR blocks allowed to access S3 buckets"
+  description = "List of CIDR blocks allowed to access GCS buckets"
   type        = list(string)
   default     = []
 }
@@ -162,19 +162,19 @@ variable "replication_destination_region" {
 # -----------------------------------------------------------------------------
 
 variable "enable_cloudwatch_metrics" {
-  description = "Enable CloudWatch metrics for S3 buckets"
+  description = "Enable CloudWatch metrics for GCS buckets"
   type        = bool
   default     = true
 }
 
 variable "enable_inventory" {
-  description = "Enable S3 inventory for buckets"
+  description = "Enable GCS inventory for buckets"
   type        = bool
   default     = true
 }
 
 variable "enable_access_logging" {
-  description = "Enable S3 access logging"
+  description = "Enable GCS access logging"
   type        = bool
   default     = true
 }
@@ -200,7 +200,7 @@ variable "partition_format" {
 # -----------------------------------------------------------------------------
 
 variable "enable_intelligent_tiering" {
-  description = "Enable S3 Intelligent Tiering"
+  description = "Enable GCS Intelligent Tiering"
   type        = bool
   default     = true
 }

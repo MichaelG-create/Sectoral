@@ -23,7 +23,7 @@ class SectoralIngestionOperator(BaseOperator):
     Ingests market data for configured sectors and writes raw data to local storage.
 
     :param config_path: Path to sectoral YAML config (default: config/sectoral.yaml)
-    :param output_dir: Directory to write raw CSV files (default: /opt/airflow/local_s3)
+    :param output_dir: Directory to write raw CSV files (default: /opt/airflow/local_gcs)
     """
 
     template_fields = ("config_path", "output_dir")
@@ -31,7 +31,7 @@ class SectoralIngestionOperator(BaseOperator):
     def __init__(
         self,
         config_path: str = "config/sectoral.yaml",
-        output_dir: str = "/opt/airflow/local_s3",
+        output_dir: str = "/opt/airflow/local_gcs",
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -69,7 +69,7 @@ class SectoralTransformOperator(BaseOperator):
     generates insights, and exports results.
 
     :param config_path: Path to sectoral YAML config
-    :param input_dir: Directory to read raw CSV files from (default: /opt/airflow/local_s3)
+    :param input_dir: Directory to read raw CSV files from (default: /opt/airflow/local_gcs)
     :param output_dir: Directory to write exports (default: outputs/)
     """
 
@@ -78,7 +78,7 @@ class SectoralTransformOperator(BaseOperator):
     def __init__(
         self,
         config_path: str = "config/sectoral.yaml",
-        input_dir: str = "/opt/airflow/local_s3",
+        input_dir: str = "/opt/airflow/local_gcs",
         output_dir: str = "outputs",
         **kwargs: Any,
     ) -> None:
@@ -136,7 +136,7 @@ class PostgresLoaderOperator(BaseOperator):
 
     ui_color = "#3498db"
 
-    def __init__(self, input_dir="/opt/airflow/local_s3", **kwargs):
+    def __init__(self, input_dir="/opt/airflow/local_gcs", **kwargs):
         super().__init__(**kwargs)
         self.input_dir = input_dir
 

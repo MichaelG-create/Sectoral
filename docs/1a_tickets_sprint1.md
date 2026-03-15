@@ -10,32 +10,32 @@
 
 ### Ticket 2 – Terraform Base Infrastructure
 
-- Configurer les providers AWS
+- Configurer les providers GCP
 - Définir variables et outputs de base
 - Structurer l’infra en modules pour la scalabilité
 
-### Ticket 3 – Buckets S3 (Data Lake)
+### Ticket 3 – Buckets GCS (Data Lake)
 
 - Bucket `raw` (données brutes) partitionné par source/date
 - Bucket `processed` (données transformées)
 - Bucket `logs` & configuration
 - Politiques de lifecycle
 
-### Ticket 4 – Redshift Data Warehouse
+### Ticket 4 – BigQuery Data Warehouse
 
 - Configuration du cluster optimisée
 - Schémas pour `staging` et `marts`
 - Tables de base pour les données financières
 
-### Ticket 5 – AWS MWAA (Airflow)
+### Ticket 5 – GCP Cloud Composer (Airflow)
 
 - Environnement managé configuré
-- Connexions vers S3 et Redshift
+- Connexions vers GCS et BigQuery
 - Variables d’environnement (APIs, paramètres globaux)
 
 ### Ticket 6 – IAM Security
 
-- Rôles pour Airflow, Redshift, Lambda
+- Rôles pour Airflow, BigQuery, Lambda
 - Politiques de moindre privilège
 - Service accounts sécurisés
 
@@ -59,9 +59,9 @@ financial-data-pipeline
 │   ├── outputs.tf
 │   ├── terraform.tfvars.example
 │   └── modules
-│       ├── s3
-│       ├── redshift
-│       ├── mwaa
+│       ├── gcp
+│       ├── bigquery
+│       ├── cloudcomposer
 │       └── iam
 ├── environments
 │   ├── dev

@@ -61,8 +61,8 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-# AWS
-.aws/
+# GCP
+.gcp/
 *.pem
 *.ppk
 
@@ -149,7 +149,7 @@ airflow/airflow.cfg
 airflow/unittests.cfg
 airflow/standalone_admin_password.txt
 
-# Redshift
+# BigQuery
 *.sql.backup
 
 # Monitoring
@@ -170,4 +170,4 @@ yarn-error.log*
 
 # script to generate local files architecture
 architecture_generation/
-local_s3/
+local_gcs/

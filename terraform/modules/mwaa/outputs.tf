@@ -1,82 +1,82 @@
 #=============================================================================
-# MWAA MODULE OUTPUTS - Financial Data Pipeline
+# Cloud Composer MODULE OUTPUTS - Financial Data Pipeline
 #=============================================================================
 #
-# Outputs for MWAA (Managed Airflow) resources
+# Outputs for Cloud Composer (Managed Airflow) resources
 #
 #------------------------------------------------------------------------------
 
-output "mwaa_environment_name" {
-  description = "Name of the MWAA environment"
-  value       = aws_mwaa_environment.main.name
+output "cloudcomposer_environment_name" {
+  description = "Name of the Cloud Composer environment"
+  value       = gcp_cloudcomposer_environment.main.name
 }
 
-output "mwaa_environment_arn" {
-  description = "ARN of the MWAA environment"
-  value       = aws_mwaa_environment.main.arn
+output "cloudcomposer_environment_arn" {
+  description = "ARN of the Cloud Composer environment"
+  value       = gcp_cloudcomposer_environment.main.arn
 }
 
-output "mwaa_webserver_url" {
-  description = "Webserver URL of the MWAA environment"
-  value       = aws_mwaa_environment.main.webserver_url
+output "cloudcomposer_webserver_url" {
+  description = "Webserver URL of the Cloud Composer environment"
+  value       = gcp_cloudcomposer_environment.main.webserver_url
 }
 
-output "mwaa_environment_status" {
-  description = "Status of the MWAA environment"
-  value       = aws_mwaa_environment.main.status
+output "cloudcomposer_environment_status" {
+  description = "Status of the Cloud Composer environment"
+  value       = gcp_cloudcomposer_environment.main.status
 }
 
-output "mwaa_service_role_arn" {
-  description = "Service role ARN of the MWAA environment"
-  value       = aws_mwaa_environment.main.service_role_arn
+output "cloudcomposer_service_role_arn" {
+  description = "Service role ARN of the Cloud Composer environment"
+  value       = gcp_cloudcomposer_environment.main.service_role_arn
 }
 
-output "mwaa_execution_role_arn" {
-  description = "Execution role ARN for MWAA"
-  value       = aws_iam_role.mwaa_execution_role.arn
+output "cloudcomposer_execution_role_arn" {
+  description = "Execution role ARN for Cloud Composer"
+  value       = gcp_iam_role.cloudcomposer_execution_role.arn
 }
 
-output "mwaa_execution_role_name" {
+output "cloudcomposer_execution_role_name" {
   description = "Name of the execution role"
-  value       = aws_iam_role.mwaa_execution_role.name
+  value       = gcp_iam_role.cloudcomposer_execution_role.name
 }
 
-output "mwaa_source_bucket_name" {
-  description = "Name of the S3 source bucket"
-  value       = aws_s3_bucket.mwaa_source.id
+output "cloudcomposer_source_bucket_name" {
+  description = "Name of the GCS source bucket"
+  value       = gcs_bucket.cloudcomposer_source.id
 }
 
-output "mwaa_source_bucket_arn" {
-  description = "ARN of the S3 source bucket"
-  value       = aws_s3_bucket.mwaa_source.arn
+output "cloudcomposer_source_bucket_arn" {
+  description = "ARN of the GCS source bucket"
+  value       = gcs_bucket.cloudcomposer_source.arn
 }
 
-output "mwaa_security_group_id" {
-  description = "Security group ID for MWAA"
-  value       = aws_security_group.mwaa.id
+output "cloudcomposer_security_group_id" {
+  description = "Security group ID for Cloud Composer"
+  value       = gcp_security_group.cloudcomposer.id
 }
 
-output "mwaa_security_group_arn" {
-  description = "Security group ARN for MWAA"
-  value       = aws_security_group.mwaa.arn
+output "cloudcomposer_security_group_arn" {
+  description = "Security group ARN for Cloud Composer"
+  value       = gcp_security_group.cloudcomposer.arn
 }
 
-output "mwaa_environment_class" {
-  description = "Environment class of the MWAA environment"
-  value       = aws_mwaa_environment.main.environment_class
+output "cloudcomposer_environment_class" {
+  description = "Environment class of the Cloud Composer environment"
+  value       = gcp_cloudcomposer_environment.main.environment_class
 }
 
-output "mwaa_airflow_version" {
-  description = "Airflow version of the MWAA environment"
-  value       = aws_mwaa_environment.main.airflow_version
+output "cloudcomposer_airflow_version" {
+  description = "Airflow version of the Cloud Composer environment"
+  value       = gcp_cloudcomposer_environment.main.airflow_version
 }
 
-output "mwaa_created_at" {
-  description = "Creation timestamp of the MWAA environment"
-  value       = aws_mwaa_environment.main.created_at
+output "cloudcomposer_created_at" {
+  description = "Creation timestamp of the Cloud Composer environment"
+  value       = gcp_cloudcomposer_environment.main.created_at
 }
 
-output "mwaa_last_updated" {
-  description = "Last update timestamp of the MWAA environment"
-  value       = aws_mwaa_environment.main.last_updated
+output "cloudcomposer_last_updated" {
+  description = "Last update timestamp of the Cloud Composer environment"
+  value       = gcp_cloudcomposer_environment.main.last_updated
 }

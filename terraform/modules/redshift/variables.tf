@@ -1,8 +1,8 @@
 #=============================================================================
-# REDSHIFT MODULE VARIABLES - Financial Data Pipeline
+# BIGQUERY MODULE VARIABLES - Financial Data Pipeline
 #=============================================================================
 #
-# Variables for Redshift cluster configuration
+# Variables for BigQuery cluster configuration
 #
 #------------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ variable "environment" {
 }
 
 variable "cluster_identifier" {
-  description = "Unique identifier for the Redshift cluster"
+  description = "Unique identifier for the BigQuery cluster"
   type        = string
 }
 
@@ -48,7 +48,7 @@ variable "node_type" {
       "dc2.large", "dc2.8xlarge", "ds2.xlarge", "ds2.8xlarge",
       "ra3.xlplus", "ra3.4xlarge", "ra3.16xlarge"
     ], var.node_type)
-    error_message = "Node type must be a valid Redshift node type."
+    error_message = "Node type must be a valid BigQuery node type."
   }
 }
 
@@ -69,7 +69,7 @@ variable "number_of_nodes" {
 }
 
 variable "port" {
-  description = "Port for the Redshift cluster"
+  description = "Port for the BigQuery cluster"
   type        = number
   default     = 5439
 }
@@ -153,21 +153,21 @@ variable "tags" {
 }
 
 variable "logging_enabled" {
-  description = "Enable logging to S3"
+  description = "Enable logging to GCS"
   type        = bool
   default     = true
 }
 
 variable "logging_bucket_name" {
-  description = "S3 bucket name for logging"
+  description = "GCS bucket name for logging"
   type        = string
   default     = null
 }
 
-variable "logging_s3_key_prefix" {
-  description = "S3 key prefix for logs"
+variable "logging_gcs_key_prefix" {
+  description = "GCS key prefix for logs"
   type        = string
-  default     = "redshift-logs/"
+  default     = "bigquery-logs/"
 }
 
 variable "snapshot_copy_enabled" {

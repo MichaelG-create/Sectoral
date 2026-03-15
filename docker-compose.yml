@@ -19,7 +19,7 @@ x-airflow-common:
     - ./airflow/plugins:/opt/airflow/plugins
     - ./config:/opt/airflow/config
     - ./outputs:/opt/airflow/outputs
-    - ./local_s3:/opt/airflow/local_s3  # Changed from named volume to bind mount
+    - ./local_gcs:/opt/airflow/local_gcs  # Changed from named volume to bind mount
     - ./src:/opt/airflow/src  # for dev only, drop for production as there's a copy in the image
     - ./dbt:/opt/airflow/dbt
   user: "${AIRFLOW_UID:-50000}:0"
@@ -84,10 +84,10 @@ services:
     command:
       - -c
       - |
-        mkdir -p /opt/airflow/logs /opt/airflow/dags /opt/airflow/plugins /opt/airflow/local_s3
-        # Only chown local_s3 (writable by airflow user)
-        chown -R 50000:0 /opt/airflow/local_s3
-        chmod -R 770 /opt/airflow/local_s3
+        mkdir -p /opt/airflow/logs /opt/airflow/dags /opt/airflow/plugins /opt/airflow/local_gcs
+        # Only chown local_gcs (writable by airflow user)
+        chown -R 50000:0 /opt/airflow/local_gcs
+        chmod -R 770 /opt/airflow/local_gcs
         exec /entrypoint airflow version
     environment:
       <<: *airflow-common-env
@@ -99,4 +99,4 @@ services:
 
 volumes:
   postgres-db-volume:
-  # airflow-local-s3:
+  # airflow-local-gcp:

@@ -10,18 +10,18 @@ Créer un pipeline automatisé d’analyse des performances sectorielles des mar
 
 ### Stack technologique
 
-- Orchestration : Apache Airflow (AWS MWAA)
-- Infrastructure : Terraform (AWS)
+- Orchestration : Apache Airflow (GCP Cloud Composer)
+- Infrastructure : Terraform (GCP)
 - Ingestion : Python (pandas, requests, boto3)
-- Stockage : AWS S3 (Data Lake)
-- Data Warehouse : Amazon Redshift
+- Stockage : GCS (Data Lake)
+- Data Warehouse : Google BigQuery
 - Transformation : dbt Core
 - Monitoring : CloudWatch, UI Airflow
 
 ### Architecture des données
 
-- APIs financières → Python (ingestion) → S3 Raw
-- dbt (transform) → Redshift (analytics)
+- APIs financières → Python (ingestion) → GCS Raw
+- dbt (transform) → BigQuery (analytics)
 - Airflow DAGs (orchestration) sur l’ensemble du pipeline
 
 ---
@@ -65,9 +65,9 @@ Créer un pipeline automatisé d’analyse des performances sectorielles des mar
 financial-data-pipeline
 ├── terraform
 │   ├── main.tf
-│   ├── s3.tf
-│   ├── redshift.tf
-│   ├── mwaa.tf
+│   ├── gcp.tf
+│   ├── bigquery.tf
+│   ├── cloudcomposer.tf
 │   └── variables.tf
 ├── airflow
 │   ├── dags
@@ -96,11 +96,11 @@ financial-data-pipeline
 ### Phase 1 – Infrastructure (Semaine 1)
 
 - Setup Terraform
-  - Provisioning AWS S3, Redshift, MWAA, IAM
+  - Provisioning GCS, BigQuery, Cloud Composer, IAM
   - Configuration networking et sécurité
 - Setup Airflow
-  - Configuration MWAA
-  - Connexions vers les services AWS
+  - Configuration Cloud Composer
+  - Connexions vers les services GCP
   - Variables d’environnement
 
 ### Phase 2 – Ingestion (Semaine 2)
@@ -108,7 +108,7 @@ financial-data-pipeline
 - Scripts Python d’ingestion
   - Clients APIs Alpha Vantage, Yahoo Finance, FRED
   - Validation et nettoyage des données
-  - Upload vers S3 (Parquet partitionné)
+  - Upload vers GCS (Parquet partitionné)
 - DAGs Airflow
   - Pipeline quotidien d’ingestion
   - Gestion des erreurs et retry
@@ -187,7 +187,7 @@ financial-data-pipeline
 
 ### Compétences data engineering
 
-- Architecture cloud moderne (AWS)
+- Architecture cloud moderne (GCP)
 - Orchestration complexe avec Airflow
 - Infrastructure as Code (Terraform)
 - Transformations SQL avancées (dbt)

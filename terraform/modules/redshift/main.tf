@@ -1,35 +1,35 @@
 # =============================================================================
-# REDSHIFT MODULE - Financial Data Pipeline
+# BIGQUERY MODULE - Financial Data Pipeline
 # =============================================================================
 
 # -----------------------------------------------------------------------------
 # Data Sources
 # -----------------------------------------------------------------------------
 
-data "aws_availability_zones" "available" {
+data "gcp_availability_zones" "available" {
   state = "available"
 }
 
 # -----------------------------------------------------------------------------
-# Redshift Subnet Group
+# BigQuery Subnet Group
 # -----------------------------------------------------------------------------
 
-resource "aws_redshift_subnet_group" "main" {
+resource "gcp_bigquery_subnet_group" "main" {
   name       = "${var.project_name}-${var.environment}-subnet-group"
   subnet_ids = var.subnet_ids
 
   tags = merge(var.common_tags, {
-    Name = "${var.project_name}-${var.environment}-redshift-subnet-group"
+    Name = "${var.project_name}-${var.environment}-bigquery-subnet-group"
   })
 }
 
 # -----------------------------------------------------------------------------
-# Redshift Parameter Group
+# BigQuery Parameter Group
 # -----------------------------------------------------------------------------
 
-resource "aws_redshift_parameter_group" "main" {
+resource "gcp_bigquery_parameter_group" "main" {
   name   = "${var.project_name}-${var.environment}-parameter-group"
-  family = "redshift-1.0"
+  family = "bigquery-1.0"
 
   parameter {
     name  = "query_timeout"
@@ -62,21 +62,21 @@ resource "aws_redshift_parameter_group" "main" {
   }
 
   tags = merge(var.common_tags, {
-    Name = "${var.project_name}-${var.environment}-redshift-parameter-group"
+    Name = "${var.project_name}-${var.environment}-bigquery-parameter-group"
   })
 }
 
 # -----------------------------------------------------------------------------
-# Security Group for Redshift
+# Security Group for BigQuery
 # -----------------------------------------------------------------------------
 
-resource "aws_security_group" "redshift" {
-  name        = "${var.project_name}-${var.environment}-redshift-sg"
-  description = "Security group for Redshift cluster"
+resource "gcp_security_group" "bigquery" {
+  name        = "${var.project_name}-${var.environment}-bigquery-sg"
+  description = "Security group for BigQuery cluster"
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "Redshift access from VPC"
+    description = "BigQuery access from VPC"
     from_port   = var.port
     to_port     = var.port
     protocol    = "tcp"
@@ -84,7 +84,7 @@ resource "aws_security_group" "redshift" {
   }
 
   ingress {
-    description     = "Redshift access from Airflow"
+    description     = "BigQuery access from Airflow"
     from_port       = var.port
     to_port         = var.port
     protocol        = "tcp"
@@ -100,38 +100,38 @@ resource "aws_security_group" "redshift" {
   }
 
   tags = merge(var.common_tags, {
-    Name = "${var.project_name}-${var.environment}-redshift-sg"
+    Name = "${var.project_name}-${var.environment}-bigquery-sg"
   })
 }
 
 # -----------------------------------------------------------------------------
-# KMS Key for Redshift Encryption
+# KMS Key for BigQuery Encryption
 # -----------------------------------------------------------------------------
 
-resource "aws_kms_key" "redshift" {
+resource "gcp_kms_key" "bigquery" {
   count = var.enable_encryption ? 1 : 0
 
-  description             = "KMS key for Redshift encryption"
+  description             = "KMS key for BigQuery encryption"
   deletion_window_in_days = 7
   enable_key_rotation     = true
 
   tags = merge(var.common_tags, {
-    Name = "${var.project_name}-${var.environment}-redshift-kms-key"
+    Name = "${var.project_name}-${var.environment}-bigquery-kms-key"
   })
 }
 
-resource "aws_kms_alias" "redshift" {
+resource "gcp_kms_alias" "bigquery" {
   count = var.enable_encryption ? 1 : 0
 
-  name          = "alias/${var.project_name}-${var.environment}-redshift"
-  target_key_id = aws_kms_key.redshift[0].key_id
+  name          = "alias/${var.project_name}-${var.environment}-bigquery"
+  target_key_id = gcp_kms_key.bigquery[0].key_id
 }
 
 # -----------------------------------------------------------------------------
-# Redshift Cluster
+# BigQuery Cluster
 # -----------------------------------------------------------------------------
 
-resource "aws_redshift_cluster" "main" {
+resource "gcp_bigquery_cluster" "main" {
   cluster_identifier      = var.cluster_identifier
   database_name          = var.database_name
   master_username        = var.master_username
@@ -141,8 +141,8 @@ resource "aws_redshift_cluster" "main" {
   port                   = var.port
 
   # Network configuration
-  cluster_subnet_group_name = aws_redshift_subnet_group.main.name
-  vpc_security_group_ids    = [aws_security_group.redshift.id]
+  cluster_subnet_group_name = gcp_bigquery_subnet_group.main.name
+  vpc_security_group_ids    = [gcp_security_group.bigquery.id]
   publicly_accessible       = false
   enhanced_vpc_routing      = var.enhanced_vpc_routing
 
@@ -155,82 +155,82 @@ resource "aws_redshift_cluster" "main" {
   preferred_maintenance_window = var.maintenance_window
 
   # Parameter group
-  cluster_parameter_group_name = aws_redshift_parameter_group.main.name
+  cluster_parameter_group_name = gcp_bigquery_parameter_group.main.name
 
   # Encryption
   encrypted  = var.enable_encryption
-  kms_key_id = var.enable_encryption ? aws_kms_key.redshift[0].arn : null
+  kms_key_id = var.enable_encryption ? gcp_kms_key.bigquery[0].arn : null
 
   # Monitoring
   enable_logging = true
   logging {
     enable        = true
     bucket_name   = var.logging_bucket_name
-    s3_key_prefix = "redshift-logs/"
+    gcs_key_prefix = "bigquery-logs/"
   }
 
   # IAM roles
-  iam_roles = [var.redshift_service_role_arn]
+  iam_roles = [var.bigquery_service_role_arn]
 
   tags = merge(var.common_tags, {
-    Name = "${var.project_name}-${var.environment}-redshift-cluster"
+    Name = "${var.project_name}-${var.environment}-bigquery-cluster"
   })
 
   depends_on = [
-    aws_redshift_subnet_group.main,
-    aws_redshift_parameter_group.main,
-    aws_security_group.redshift
+    gcp_bigquery_subnet_group.main,
+    gcp_bigquery_parameter_group.main,
+    gcp_security_group.bigquery
   ]
 }
 
 # -----------------------------------------------------------------------------
-# Redshift Scheduled Actions (for auto-scaling)
+# BigQuery Scheduled Actions (for auto-scaling)
 # -----------------------------------------------------------------------------
 
-resource "aws_redshift_scheduled_action" "pause_cluster" {
+resource "gcp_bigquery_scheduled_action" "pause_cluster" {
   count = var.enable_auto_pause ? 1 : 0
 
   name        = "${var.project_name}-${var.environment}-pause-cluster"
-  description = "Pause Redshift cluster during off-hours"
+  description = "Pause BigQuery cluster during off-hours"
   schedule    = var.pause_schedule
-  iam_role    = var.redshift_scheduler_role_arn
+  iam_role    = var.bigquery_scheduler_role_arn
 
   target_action {
     pause_cluster {
-      cluster_identifier = aws_redshift_cluster.main.cluster_identifier
+      cluster_identifier = gcp_bigquery_cluster.main.cluster_identifier
     }
   }
 
-  depends_on = [aws_redshift_cluster.main]
+  depends_on = [gcp_bigquery_cluster.main]
 }
 
-resource "aws_redshift_scheduled_action" "resume_cluster" {
+resource "gcp_bigquery_scheduled_action" "resume_cluster" {
   count = var.enable_auto_pause ? 1 : 0
 
   name        = "${var.project_name}-${var.environment}-resume-cluster"
-  description = "Resume Redshift cluster during work hours"
+  description = "Resume BigQuery cluster during work hours"
   schedule    = var.resume_schedule
-  iam_role    = var.redshift_scheduler_role_arn
+  iam_role    = var.bigquery_scheduler_role_arn
 
   target_action {
     resume_cluster {
-      cluster_identifier = aws_redshift_cluster.main.cluster_identifier
+      cluster_identifier = gcp_bigquery_cluster.main.cluster_identifier
     }
   }
 
-  depends_on = [aws_redshift_cluster.main]
+  depends_on = [gcp_bigquery_cluster.main]
 }
 
 # -----------------------------------------------------------------------------
-# Redshift Event Subscription
+# BigQuery Event Subscription
 # -----------------------------------------------------------------------------
 
-resource "aws_redshift_event_subscription" "main" {
-  name      = "${var.project_name}-${var.environment}-redshift-events"
+resource "gcp_bigquery_event_subscription" "main" {
+  name      = "${var.project_name}-${var.environment}-bigquery-events"
   sns_topic = var.sns_topic_arn
 
   source_type = "cluster"
-  source_ids  = [aws_redshift_cluster.main.cluster_identifier]
+  source_ids  = [gcp_bigquery_cluster.main.cluster_identifier]
 
   severity = "ERROR"
 
@@ -244,79 +244,79 @@ resource "aws_redshift_event_subscription" "main" {
   enabled = true
 
   tags = merge(var.common_tags, {
-    Name = "${var.project_name}-${var.environment}-redshift-event-subscription"
+    Name = "${var.project_name}-${var.environment}-bigquery-event-subscription"
   })
 }
 
 # -----------------------------------------------------------------------------
-# CloudWatch Alarms for Redshift
+# CloudWatch Alarms for BigQuery
 # -----------------------------------------------------------------------------
 
-resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
-  alarm_name          = "${var.project_name}-${var.environment}-redshift-cpu-utilization"
+resource "gcp_cloudwatch_metric_alarm" "cpu_utilization" {
+  alarm_name          = "${var.project_name}-${var.environment}-bigquery-cpu-utilization"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
-  namespace           = "AWS/Redshift"
+  namespace           = "GCP/BigQuery"
   period              = "300"
   statistic           = "Average"
   threshold           = "80"
-  alarm_description   = "This metric monitors redshift cpu utilization"
+  alarm_description   = "This metric monitors bigquery cpu utilization"
   alarm_actions       = [var.sns_topic_arn]
 
   dimensions = {
-    ClusterIdentifier = aws_redshift_cluster.main.cluster_identifier
+    ClusterIdentifier = gcp_bigquery_cluster.main.cluster_identifier
   }
 
   tags = var.common_tags
 }
 
-resource "aws_cloudwatch_metric_alarm" "database_connections" {
-  alarm_name          = "${var.project_name}-${var.environment}-redshift-database-connections"
+resource "gcp_cloudwatch_metric_alarm" "database_connections" {
+  alarm_name          = "${var.project_name}-${var.environment}-bigquery-database-connections"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "2"
   metric_name         = "DatabaseConnections"
-  namespace           = "AWS/Redshift"
+  namespace           = "GCP/BigQuery"
   period              = "300"
   statistic           = "Average"
   threshold           = "40"
-  alarm_description   = "This metric monitors redshift database connections"
+  alarm_description   = "This metric monitors bigquery database connections"
   alarm_actions       = [var.sns_topic_arn]
 
   dimensions = {
-    ClusterIdentifier = aws_redshift_cluster.main.cluster_identifier
+    ClusterIdentifier = gcp_bigquery_cluster.main.cluster_identifier
   }
 
   tags = var.common_tags
 }
 
-resource "aws_cloudwatch_metric_alarm" "health_status" {
-  alarm_name          = "${var.project_name}-${var.environment}-redshift-health-status"
+resource "gcp_cloudwatch_metric_alarm" "health_status" {
+  alarm_name          = "${var.project_name}-${var.environment}-bigquery-health-status"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "HealthStatus"
-  namespace           = "AWS/Redshift"
+  namespace           = "GCP/BigQuery"
   period              = "60"
   statistic           = "Average"
   threshold           = "1"
-  alarm_description   = "This metric monitors redshift health status"
+  alarm_description   = "This metric monitors bigquery health status"
   alarm_actions       = [var.sns_topic_arn]
 
   dimensions = {
-    ClusterIdentifier = aws_redshift_cluster.main.cluster_identifier
+    ClusterIdentifier = gcp_bigquery_cluster.main.cluster_identifier
   }
 
   tags = var.common_tags
 }
 
 # -----------------------------------------------------------------------------
-# Redshift Usage Limits
+# BigQuery Usage Limits
 # -----------------------------------------------------------------------------
 
-resource "aws_redshift_usage_limit" "concurrency_scaling" {
+resource "gcp_bigquery_usage_limit" "concurrency_scaling" {
   count = var.enable_concurrency_scaling ? 1 : 0
 
-  cluster_identifier = aws_redshift_cluster.main.cluster_identifier
+  cluster_identifier = gcp_bigquery_cluster.main.cluster_identifier
   feature_type       = "concurrency-scaling"
   limit_type         = "time"
   amount             = var.concurrency_scaling_max_time
@@ -329,10 +329,10 @@ resource "aws_redshift_usage_limit" "concurrency_scaling" {
   })
 }
 
-resource "aws_redshift_usage_limit" "spectrum" {
+resource "gcp_bigquery_usage_limit" "spectrum" {
   count = var.enable_spectrum_limit ? 1 : 0
 
-  cluster_identifier = aws_redshift_cluster.main.cluster_identifier
+  cluster_identifier = gcp_bigquery_cluster.main.cluster_identifier
   feature_type       = "spectrum"
   limit_type         = "data-scanned"
   amount             = var.spectrum_data_limit_tb
@@ -346,14 +346,14 @@ resource "aws_redshift_usage_limit" "spectrum" {
 }
 
 # -----------------------------------------------------------------------------
-# Redshift Snapshot Configuration
+# BigQuery Snapshot Configuration
 # -----------------------------------------------------------------------------
 
-resource "aws_redshift_snapshot_copy_grant" "main" {
+resource "gcp_bigquery_snapshot_copy_grant" "main" {
   count = var.enable_cross_region_snapshots ? 1 : 0
 
   snapshot_copy_grant_name = "${var.project_name}-${var.environment}-snapshot-copy-grant"
-  kms_key_id              = var.enable_encryption ? aws_kms_key.redshift[0].arn : null
+  kms_key_id              = var.enable_encryption ? gcp_kms_key.bigquery[0].arn : null
 
   tags = merge(var.common_tags, {
     Name = "${var.project_name}-${var.environment}-snapshot-copy-grant"
@@ -361,12 +361,12 @@ resource "aws_redshift_snapshot_copy_grant" "main" {
 }
 
 # -----------------------------------------------------------------------------
-# Redshift Workload Management (WLM) Configuration
+# BigQuery Workload Management (WLM) Configuration
 # -----------------------------------------------------------------------------
 
-resource "aws_redshift_parameter_group" "wlm_config" {
+resource "gcp_bigquery_parameter_group" "wlm_config" {
   name   = "${var.project_name}-${var.environment}-wlm-config"
-  family = "redshift-1.0"
+  family = "bigquery-1.0"
 
   parameter {
     name  = "wlm_json_configuration"

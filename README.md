@@ -1,15 +1,15 @@
 # Sectoral – Financial Data Pipeline
 
-Automated, production-grade data pipeline for analyzing sectoral performance of financial markets on AWS (S3, Redshift, MWAA) with Airflow orchestration and dbt transformations.
+Automated, production-grade data pipeline for analyzing sectoral performance of financial markets on GCP (GCS, BigQuery, Cloud Composer) with Airflow orchestration and dbt transformations.
 
 ## 1. Project Overview
 
-This project ingests market and macro data from multiple financial APIs, stores it in an S3-based data lake, transforms it with dbt into a Redshift warehouse, and exposes curated marts for sector performance, risk and trading signal analysis.
+This project ingests market and macro data from multiple financial APIs, stores it in an GCS-based data lake, transforms it with dbt into a BigQuery warehouse, and exposes curated marts for sector performance, risk and trading signal analysis.
 
 **Main goals**:
 - Centralize **sector-level** and **symbol-level** market data.
 - Compute advanced metrics (returns, volatility, correlations, VaR, sector rotation signals).
-- Provide a reproducible, IaC-driven deployment on AWS (Terraform + MWAA + Redshift).
+- Provide a reproducible, IaC-driven deployment on GCP (Terraform + Cloud Composer + BigQuery).
 
 For detailed technical documentation, see `sectoral-detailed-readme.md`.
 
@@ -20,12 +20,12 @@ For detailed technical documentation, see `sectoral-detailed-readme.md`.
 High-level data flow:
 
 - External APIs: Alpha Vantage, Yahoo Finance, FRED (macro).
-- Ingestion: Python scripts and Airflow DAGs write raw Parquet to S3.
-- Storage: AWS S3 raw zone.
-- Transformations: dbt Core on top of Redshift (staging → intermediate → marts).
-- Data warehouse: Amazon Redshift (sector and symbol-level tables).
+- Ingestion: Python scripts and Airflow DAGs write raw Parquet to GCS.
+- Storage: GCS raw zone.
+- Transformations: dbt Core on top of BigQuery (staging → intermediate → marts).
+- Data warehouse: Google BigQuery (sector and symbol-level tables).
 - Analytics: SQL queries, dashboards, and exports.
-- Orchestration: Apache Airflow (local and AWS MWAA).
+- Orchestration: Apache Airflow (local and GCP Cloud Composer).
 
 
 Core folders:
@@ -33,7 +33,7 @@ Core folders:
 - `src/sectoral/`: application code (ingestion, transforms, CLI, config, operators).
 - `airflow/`: local Airflow setup, DAGs, plugins, config.
 - `dbt/`: dbt project (`models/`, `macros/`, `tests/`, `profiles.yml.example`).
-- `terraform/`: AWS infrastructure (S3, Redshift, MWAA, IAM, environments).
+- `terraform/`: GCP infrastructure (GCS, BigQuery, Cloud Composer, IAM, environments).
 - `scripts/`: deployment, setup and utilities (e.g. `deploy_airflow.sh`, `test_connections.py`).
 - `tests/`: unit and integration tests for pipeline components and metrics.
 - `images/`: architecture diagrams (e.g. `sectoral-workflow.png`).
@@ -44,21 +44,21 @@ Core folders:
 - **Data ingestion**
   - Daily and weekly DAGs for stocks, sectors and macro indicators.
   - Custom Airflow hooks for Alpha Vantage and Yahoo Finance.
-  - Local S3 emulation for development (`docker-compose.yml` + `.locals3/`).
+  - Local GCS emulation for development (`docker-compose.yml` + `.localgcs/`).
 
 - **Transformations & metrics**
   - dbt models for staging, intermediate and marts (e.g. sector performance, risk metrics, trading signals).
   - Metrics: daily and cumulative returns, rolling volatility, Sharpe ratio, sector correlations, VaR, drawdowns, rotation indicators.
 
 - **Infrastructure & orchestration**
-  - Terraform modules for S3 buckets, Redshift cluster, MWAA environment, IAM roles.
+  - Terraform modules for GCS buckets, BigQuery cluster, Cloud Composer environment, IAM roles.
   - Local Airflow environment via Docker for development and debugging.
 
 - **Quality & monitoring**
   Tests are split into `tests/unit` and `tests/integration`, and dbt tests are defined in `dbt/models` YAML files; run `pytest` and `dbt test` for full coverage.
   - dbt tests (not null, accepted values, relationships) and custom tests.
   - Python tests (unit/integration) for ingestion and transformations.
-  - CloudWatch / Airflow logs in AWS; local logs for dev.
+  - CloudWatch / Airflow logs in GCP; local logs for dev.
 
 ## 4. Getting Started
 
@@ -68,13 +68,13 @@ Local tools:
 
 - Python 3.9+
 - Terraform 1.0+
-- AWS CLI v2 (`aws configure`)
+- GCP CLI v2 (`gcp configure`)
 - Docker + docker-compose
 - Git
 
-AWS resources (for cloud deployment):
+GCP resources (for cloud deployment):
 
-- AWS account and IAM user/role with permissions for S3, Redshift, MWAA, IAM, CloudWatch.
+- GCP account and IAM user/role with permissions for GCS, BigQuery, Cloud Composer, IAM, CloudWatch.
 
 ### 4.2 Local setup
 
@@ -87,7 +87,7 @@ AWS resources (for cloud deployment):
 2. Environment:
    ```bash
    cp .env.example .env
-   # edit API keys, AWS profile/region, project name, etc.
+   # edit API keys, GCP profile/region, project name, etc.
    ```
 
 3. Python dependencies (uv):
@@ -107,13 +107,13 @@ AWS resources (for cloud deployment):
    dbt test --project-dir dbt
    ```
 
-### 4.3 AWS deployment (Terraform)
+### 4.3 GCP deployment (Terraform)
 
 1. Configure Terraform variables:
    ```bash
    cd terraform
    cp environments/dev.tfvars.example environments/dev.tfvars
-   # edit project name, region, Redshift node type, MWAA config…
+   # edit project name, region, BigQuery node type, Cloud Composer config…
    ```
 
 2. Deploy:
@@ -123,11 +123,11 @@ AWS resources (for cloud deployment):
    terraform apply -var-file=environments/dev.tfvars
    ```
 
-Outputs include S3 bucket names, Redshift endpoint and MWAA environment details.
+Outputs include GCS bucket names, BigQuery endpoint and Cloud Composer environment details.
 
 ## 5. Usage
 
-- **Airflow DAGs** (local or MWAA):
+- **Airflow DAGs** (local or Cloud Composer):
   - Daily marketing/sector ingestion: `daily_market_ingestion` (name as defined in `airflow/dags/`).
   - Weekly sector analysis: `weekly_sector_analysis`.
   - Data quality checks (dbt tests, validation operators).
@@ -143,7 +143,7 @@ Outputs include S3 bucket names, Redshift endpoint and MWAA environment details.
 
 - **CLI / scripts**
   - `src/sectoral/cli.py` (lightweight CLI entrypoints; see docstring and usage examples).
-  - `scripts/utilities/test_connections.py` to validate AWS and Redshift connectivity.
+  - `scripts/utilities/test_connections.py` to validate GCP and BigQuery connectivity.
 
 ## 6. Roadmap
 
@@ -170,4 +170,4 @@ As a data engineer, I want dbt models for sector metrics so I can query performa
 
 These models sit logically in the dbt flow:
 
-`raw (S3 / Postgres) → staging (stg_*) → intermediate (int_sector_aggregates) → marts (mart_sector_performance) → analytics / dashboards.`
+`raw (GCS / Postgres) → staging (stg_*) → intermediate (int_sector_aggregates) → marts (mart_sector_performance) → analytics / dashboards.`

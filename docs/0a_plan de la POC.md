@@ -45,4 +45,4 @@ Un résumé exécutif est affiché dans le terminal à la fin de l’exécution.
 - Analytics sectorielles avancées
 - Export pour consommation downstream
 
-Une fois la POC validée, on pourra passer à l’architecture complète (Airflow, AWS, dbt, etc.).
+Une fois la POC validée, on pourra passer à l’architecture complète (Airflow, GCP, dbt, etc.).

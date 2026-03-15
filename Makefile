@@ -186,10 +186,10 @@ deploy-dbt: dbt-deps dbt-debug dbt-run dbt-test
 
 .PHONY: deploy-airflow
 deploy-airflow:
-	@echo "Uploading DAGs to S3..."
-	aws s3 sync $(AIRFLOW_DIR)/dags/ s3://$(S3_BUCKET_AIRFLOW)/dags/
-	aws s3 sync $(AIRFLOW_DIR)/plugins/ s3://$(S3_BUCKET_AIRFLOW)/plugins/
-	aws s3 cp $(AIRFLOW_DIR)/config/requirements.txt s3://$(S3_BUCKET_AIRFLOW)/requirements.txt
+	@echo "Uploading DAGs to GCS..."
+	gcp gcs sync $(AIRFLOW_DIR)/dags/ gcp://$(GCS_BUCKET_AIRFLOW)/dags/
+	gcp gcs sync $(AIRFLOW_DIR)/plugins/ gcp://$(GCS_BUCKET_AIRFLOW)/plugins/
+	gcp gcs cp $(AIRFLOW_DIR)/config/requirements.txt gcp://$(GCS_BUCKET_AIRFLOW)/requirements.txt
 
 .PHONY: deploy-pipeline
 deploy-pipeline: deploy-dbt deploy-airflow
@@ -205,21 +205,21 @@ check-pipeline-health:
 
 .PHONY: view-logs
 view-logs:
-	aws logs tail /aws/mwaa/$(PROJECT_NAME) --follow
+	gcp logs tail /gcp/cloudcomposer/$(PROJECT_NAME) --follow
 
-.PHONY: check-s3-data
-check-s3-data:
-	aws s3 ls s3://$(S3_BUCKET_RAW_DATA)/ --recursive --human-readable --summarize
+.PHONY: check-gcp-data
+check-gcp-data:
+	gcp gcs ls gcp://$(GCS_BUCKET_RAW_DATA)/ --recursive --human-readable --summarize
 
 # Backup Commands
-.PHONY: backup-redshift
-backup-redshift:
-	bash scripts/utilities/backup_redshift.sh
+.PHONY: backup-bigquery
+backup-bigquery:
+	bash scripts/utilities/backup_bigquery.sh
 
-.PHONY: backup-s3
-backup-s3:
-	aws s3 sync s3://$(S3_BUCKET_RAW_DATA)/ ./backups/s3-raw-data/
-	aws s3 sync s3://$(S3_BUCKET_PROCESSED_DATA)/ ./backups/s3-processed-data/
+.PHONY: backup-gcp
+backup-gcp:
+	gcp gcs sync gcp://$(GCS_BUCKET_RAW_DATA)/ ./backups/gcp-raw-data/
+	gcp gcs sync gcp://$(GCS_BUCKET_PROCESSED_DATA)/ ./backups/gcp-processed-data/
 
 # Development Environment
 .PHONY: start-local-dev

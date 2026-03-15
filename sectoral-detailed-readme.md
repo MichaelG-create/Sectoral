@@ -6,7 +6,7 @@
 
 1. [Architecture Détaillée](#architecture-détaillée)
 2. [Setup Environnement](#setup-environnement)
-3. [Configuration AWS](#configuration-aws)
+3. [Configuration GCP](#configuration-gcp)
 4. [Déploiement Terraform](#déploiement-terraform)
 5. [Configuration Airflow](#configuration-airflow)
 6. [Modèles dbt](#modèles-dbt)
@@ -25,7 +25,7 @@
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   APIs Externes │    │   Data Pipeline  │    │   Data Storage  │
 ├─────────────────┤    ├──────────────────┤    ├─────────────────┤
-│ • Yahoo Finance │───▶│ Python Ingestion │───▶│ S3 Raw Zone     │
+│ • Yahoo Finance │───▶│ Python Ingestion │───▶│ GCS Raw Zone     │
 │ • Alpha Vantage │    │ • Validation     │    │ • JSON/Parquet  │
 │ • FRED API      │    │ • Enrichment     │    │ • Partitioning  │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
@@ -34,22 +34,22 @@
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   Orchestration │    │  Transformation  │    │  Data Warehouse │
 ├─────────────────┤    ├──────────────────┤    ├─────────────────┤
-│ Apache Airflow  │───▶│ dbt Core         │───▶│ Amazon Redshift │
+│ Apache Airflow  │───▶│ dbt Core         │───▶│ Google BigQuery │
 │ • DAGs          │    │ • Staging        │    │ • Dimensional   │
 │ • Scheduling    │    │ • Intermediate   │    │ • Star Schema   │
 │ • Monitoring    │    │ • Marts          │    │ • Aggregations  │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
-### Composants AWS
+### Composants GCP
 
 | Service | Usage | Configuration |
 |---------|-------|---------------|
-| **S3** | Data Lake | Buckets : raw/, processed/, logs/ |
-| **Redshift** | Data Warehouse | dc2.large cluster (dev), ra3.xlplus (prod) |
-| **MWAA** | Airflow Managed | Environment v2.5.1, Small instance |
+| **GCS** | Data Lake | Buckets : raw/, processed/, logs/ |
+| **BigQuery** | Data Warehouse | dc2.large cluster (dev), ra3.xlplus (prod) |
+| **Cloud Composer** | Airflow Managed | Environment v2.5.1, Small instance |
 | **IAM** | Sécurité | Roles : AirflowExecutionRole, dbtRole |
-| **VPC** | Réseau | Private subnets pour Redshift |
+| **VPC** | Réseau | Private subnets pour BigQuery |
 | **CloudWatch** | Monitoring | Logs + métriques custom |
 
 ---
@@ -62,9 +62,9 @@
 # Python 3.8+
 python --version
 
-# AWS CLI v2
-aws --version
-aws configure
+# GCP CLI v2
+gcp --version
+gcp configure
 
 # Terraform
 terraform --version
@@ -77,8 +77,8 @@ git --version
 
 ```bash
 # .env
-export AWS_REGION=eu-west-1
-export AWS_PROFILE=sectoral
+export GCP_REGION=eu-west-1
+export GCP_PROFILE=sectoral
 export PROJECT_NAME=sectoral
 export ENVIRONMENT=dev
 
@@ -107,17 +107,17 @@ numpy>=1.21.0
 yfinance>=0.2.0
 requests>=2.28.0
 
-# AWS
+# GCP
 boto3>=1.26.0
-awswrangler>=3.0.0
+gcpwrangler>=3.0.0
 
 # dbt
 dbt-core>=1.4.0
-dbt-redshift>=1.4.0
+dbt-bigquery>=1.4.0
 
 # Airflow (pour développement local)
 apache-airflow>=2.5.0
-apache-airflow-providers-amazon>=7.0.0
+apache-airflow-providers-google>=7.0.0
 
 # Utils
 python-dotenv>=0.19.0
@@ -127,14 +127,14 @@ great-expectations>=0.15.0  # Data quality
 
 ---
 
-## ☁️ Configuration AWS
+## ☁️ Configuration GCP
 
-### 1. Création du Profil AWS
+### 1. Création du Profil GCP
 
 ```bash
-aws configure --profile sectoral
-# AWS Access Key ID: AKIA...
-# AWS Secret Access Key: ...
+gcp configure --profile sectoral
+# GCP Access Key ID: AKIA...
+# GCP Secret Access Key: ...
 # Default region: eu-west-1
 # Default output format: json
 ```
@@ -149,9 +149,9 @@ aws configure --profile sectoral
         {
             "Effect": "Allow",
             "Action": [
-                "s3:*",
-                "redshift:*",
-                "mwaa:*",
+                "gcp:*",
+                "bigquery:*",
+                "cloudcomposer:*",
                 "iam:PassRole",
                 "logs:*",
                 "cloudwatch:*"
@@ -166,10 +166,10 @@ aws configure --profile sectoral
 
 ```bash
 # Test connexion
-aws sts get-caller-identity --profile sectoral
+gcp sts get-caller-identity --profile sectoral
 
 # Vérification région
-aws configure get region --profile sectoral
+gcp configure get region --profile sectoral
 ```
 
 ---
@@ -183,11 +183,11 @@ terraform/
 ├── main.tf              # Configuration principale
 ├── variables.tf         # Variables d'entrée
 ├── outputs.tf          # Sorties (endpoints, ARNs)
-├── providers.tf        # Providers AWS
+├── providers.tf        # Providers GCP
 ├── modules/
-│   ├── s3/             # Module S3 buckets
-│   ├── redshift/       # Module Redshift cluster
-│   ├── mwaa/           # Module Airflow
+│   ├── gcp/             # Module GCS buckets
+│   ├── bigquery/       # Module BigQuery cluster
+│   ├── cloudcomposer/           # Module Airflow
 │   └── iam/            # Module IAM roles
 └── environments/
     ├── dev.tfvars      # Variables dev
@@ -201,39 +201,39 @@ terraform/
 terraform {
   required_version = ">= 1.0"
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
+    gcp = {
+      source  = "hashicorp/gcp"
       version = "~> 5.0"
     }
   }
 }
 
-provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
+provider "gcp" {
+  region  = var.gcp_region
+  profile = var.gcp_profile
 }
 
-module "s3" {
-  source = "./modules/s3"
+module "gcp" {
+  source = "./modules/gcp"
 
   project_name = var.project_name
   environment  = var.environment
 }
 
-module "redshift" {
-  source = "./modules/redshift"
+module "bigquery" {
+  source = "./modules/bigquery"
 
   project_name    = var.project_name
   environment     = var.environment
-  master_password = var.redshift_password
+  master_password = var.bigquery_password
 }
 
-module "mwaa" {
-  source = "./modules/mwaa"
+module "cloudcomposer" {
+  source = "./modules/cloudcomposer"
 
   project_name = var.project_name
   environment  = var.environment
-  s3_bucket    = module.s3.airflow_bucket_name
+  gcs_bucket    = module.gcp.airflow_bucket_name
 }
 ```
 
@@ -259,19 +259,19 @@ terraform output
 
 **environments/dev.tfvars**
 ```hcl
-aws_region = "eu-west-1"
-aws_profile = "sectoral"
+gcp_region = "eu-west-1"
+gcp_profile = "sectoral"
 project_name = "sectoral"
 environment = "dev"
 
-# Redshift
-redshift_node_type = "dc2.large"
-redshift_cluster_type = "single-node"
-redshift_password = "ChangeMe123!"
+# BigQuery
+bigquery_node_type = "dc2.large"
+bigquery_cluster_type = "single-node"
+bigquery_password = "ChangeMe123!"
 
-# MWAA
-mwaa_environment_class = "mw1.small"
-mwaa_max_workers = 2
+# Cloud Composer
+cloudcomposer_environment_class = "mw1.small"
+cloudcomposer_max_workers = 2
 ```
 
 ---
@@ -302,7 +302,7 @@ airflow/
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
+from airflow.providers.google.gcp.operators.gcp import GCSCreateBucketOperator
 from sectoral_operators import SectoralIngestionOperator, SectoralTransformOperator
 
 default_args = {
@@ -329,7 +329,7 @@ ingest_stocks = SectoralIngestionOperator(
     task_id='ingest_stock_data',
     data_sources=['yahoo_finance', 'alpha_vantage'],
     symbols="{{ var.value.stock_symbols }}",
-    s3_bucket="{{ var.value.s3_raw_bucket }}",
+    gcs_bucket="{{ var.value.gcs_raw_bucket }}",
     dag=dag
 )
 
@@ -361,8 +361,8 @@ ingest_stocks >> validate_data >> transform_data
     "XOM", "CVX", "COP", "SLB",
     "AMZN", "TSLA", "HD", "MCD"
   ],
-  "s3_raw_bucket": "sectoral-dev-raw-data",
-  "redshift_connection": "redshift_default",
+  "gcs_raw_bucket": "sectoral-dev-raw-data",
+  "bigquery_connection": "bigquery_default",
   "notification_email": "admin@sectoral.com"
 }
 ```
@@ -575,7 +575,7 @@ def publish_data_quality_metrics(success_rate, records_processed):
 ```python
 def send_alert(message, severity='INFO'):
     sns = boto3.client('sns')
-    topic_arn = 'arn:aws:sns:eu-west-1:123456789:SectoralAlerts'
+    topic_arn = 'arn:gcp:sns:eu-west-1:123456789:SectoralAlerts'
 
     sns.publish(
         TopicArn=topic_arn,
@@ -594,13 +594,13 @@ def send_alert(message, severity='INFO'):
 ```bash
 # Erreur : "AccessDenied"
 # Solution : Vérifier les permissions IAM
-aws iam list-attached-user-policies --user-name your-user
+gcp iam list-attached-user-policies --user-name your-user
 ```
 
 #### 2. Airflow DAG ne démarre pas
 ```bash
-# Vérifier les logs MWAA
-aws logs describe-log-groups --log-group-name-prefix="/aws/mwaa/sectoral"
+# Vérifier les logs Cloud Composer
+gcp logs describe-log-groups --log-group-name-prefix="/gcp/cloudcomposer/sectoral"
 
 # Test syntaxe DAG
 python -c "from airflow.models import DagBag; d = DagBag()"
@@ -611,7 +611,7 @@ python -c "from airflow.models import DagBag; d = DagBag()"
 # Debug dbt
 dbt debug --profiles-dir ./profiles
 
-# Test connexion Redshift
+# Test connexion BigQuery
 dbt run --select stg_stock_prices --profiles-dir ./profiles
 ```
 
@@ -644,13 +644,13 @@ dbt run --log-level debug 2>&1 | tee dbt.log
 ### Sécurité
 - ✅ Pas de credentials hardcodés
 - ✅ Rotation des clés API
-- ✅ Encryption S3 et Redshift
+- ✅ Encryption GCS et BigQuery
 - ✅ VPC et Security Groups restrictifs
 
 ### Performance
-- ✅ Partitioning S3 par date
+- ✅ Partitioning GCS par date
 - ✅ Compression Parquet
-- ✅ Index Redshift sur colonnes fréquentes
+- ✅ Index BigQuery sur colonnes fréquentes
 - ✅ Parallel processing Airflow
 
 ### Qualité de Code
@@ -663,15 +663,15 @@ dbt run --log-level debug 2>&1 | tee dbt.log
 - ✅ Alertes business (données manquantes > 20%)
 - ✅ SLA monitoring (pipeline < 2h)
 - ✅ Data freshness checks
-- ✅ Cost monitoring AWS
+- ✅ Cost monitoring GCP
 
 ---
 
 ## 📚 Ressources Complémentaires
 
-- [AWS MWAA Documentation](https://docs.aws.amazon.com/mwaa/)
+- [GCP Cloud Composer Documentation](https://docs.gcp.google.com/cloudcomposer/)
 - [dbt Documentation](https://docs.getdbt.com/)
-- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
+- [Terraform GCP Provider](https://registry.terraform.io/providers/hashicorp/gcp/latest/docs)
 - [Apache Airflow Guide](https://airflow.apache.org/docs/)
 
 ---
